@@ -1,0 +1,213 @@
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, FileImage, Download, ChevronRight } from 'lucide-react';
+import { fetchPokaYokesData } from '../utils/csvParser';
+
+const BDIA_POSTOS = [
+  'POSTO 3', 'POSTO 4', 'POSTO 6', 'POSTO 8', 'POSTO 9', 'POSTO 10', 'POSTO 12', 'IF BDIA', 'RETRABALHO'
+];
+
+const BTR_POSTOS = [
+  'PREPARAÇÃO DA ESTRUTURA', 'POSTO 6', 'POSTO 7', 'INSPEÇÃO FINAL - P13C', 'INSPEÇÃO FINAL - P02H'
+];
+
+export default function Placas() {
+  const [activeTab, setActiveTab] = useState('BDIA');
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPosto, setSelectedPosto] = useState('');
+  const [placaPronta, setPlacaPronta] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+      const items = await fetchPokaYokesData();
+      setData(items);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const postos = activeTab === 'BDIA' ? BDIA_POSTOS : BTR_POSTOS;
+
+  // Filtra de forma mais flexível para evitar problemas com espaços e nomes diferentes na planilha mestre
+  const pokaYokesDoPosto = data.filter(item => {
+    let postoItem = String(item['DISPOSITIVO/POSTO'] || '').toUpperCase().trim();
+    const postoFiltro = String(selectedPosto || '').toUpperCase().trim();
+    
+    // Mapeamentos específicos do BTR na planilha mestre
+    if (postoItem === 'DFE015') postoItem = 'PREPARAÇÃO DA ESTRUTURA';
+    if (postoItem.includes('PIVOT PIN') || postoItem.includes('POSTO 7')) postoItem = 'POSTO 7';
+    if (postoItem === 'INSPEÇÃO FINAL P13C') postoItem = 'INSPEÇÃO FINAL - P13C';
+    if (postoItem === 'INSPEÇÃO FINAL P02H') postoItem = 'INSPEÇÃO FINAL - P02H';
+
+    const normalize = (p) => String(p).replace(/POSTO 0+(\d+)/, 'POSTO $1').replace(/\s+/g, ' ');
+    
+    return normalize(postoItem) === normalize(postoFiltro) || normalize(postoItem).includes(normalize(postoFiltro));
+  });
+
+  if (loading) {
+    return <div className="card text-center"><p>Carregando dados das placas...</p></div>;
+  }
+
+  return (
+    <div className="page-grid">
+      {/* Sidebar - Selecione o Posto */}
+      <div className="card" style={{ padding: 0, overflow: 'hidden', height: 'fit-content' }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, margin: 0 }}>Selecione o Posto</h2>
+            <span style={{ backgroundColor: 'var(--color-bg-main)', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)' }}>
+              {postos.length} Ativos
+            </span>
+          </div>
+          <div className="segmented-control">
+            <button 
+              className={`segmented-btn ${activeTab === 'BDIA' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('BDIA'); setSelectedPosto(''); setPlacaPronta(false); }}
+            >
+              BDIA
+            </button>
+            <button 
+              className={`segmented-btn ${activeTab === 'BTR' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('BTR'); setSelectedPosto(''); setPlacaPronta(false); }}
+            >
+              BTR
+            </button>
+          </div>
+        </div>
+        
+        <div className="sidebar-list">
+          {postos.map((posto, idx) => (
+            <button 
+              key={posto || idx}
+              className={`posto-item ${selectedPosto === posto ? 'active' : ''}`}
+              onClick={() => { setSelectedPosto(posto); setPlacaPronta(false); }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className={`status-dot ${selectedPosto === posto ? 'green' : 'gray'}`}></div>
+                {posto}
+              </div>
+              <ChevronRight size={16} />
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Conteúdo Principal */}
+      <div>
+          {!selectedPosto ? (
+            <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--color-bg-main)', borderRadius: 'var(--radius-md)' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
+                👈 Selecione um posto ao lado para visualizar a Placa Poka-Yoke completa.
+              </p>
+            </div>
+          ) : (
+            <div style={{ border: '2px solid var(--color-primary)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', backgroundColor: 'var(--color-bg-card)', boxShadow: 'var(--shadow-md)' }}>
+              {/* Cabeçalho da Placa Simulando Documento */}
+              <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '1rem', textAlign: 'center' }}>
+                <h3 style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                  Folha de Definição e Validação - Poka Yoke
+                </h3>
+                <p style={{ fontWeight: 600, marginTop: '0.5rem' }}>LINHA: {activeTab} | POSTO: {selectedPosto}</p>
+              </div>
+
+              <div style={{ padding: '2rem' }}>
+                {pokaYokesDoPosto.length === 0 ? (
+                  <p className="text-muted text-center">Nenhum Poka-Yoke registrado no sistema para este posto.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
+        
+                    {/* Lista de Poka Yokes */}
+                    <div style={{ borderBottom: '2px dashed var(--color-border)', paddingBottom: '1rem' }}>
+                      <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Poka Yoke Nº</h4>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {pokaYokesDoPosto.map((py, i) => (
+                           <span key={py.PY || i} style={{ backgroundColor: '#EEF2FF', color: 'var(--color-primary)', padding: '0.25rem 0.75rem', borderRadius: '4px', fontWeight: 600 }}>
+                             {py.PY}
+                           </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Especificações */}
+                    <div style={{ borderBottom: '2px dashed var(--color-border)', paddingBottom: '1rem' }}>
+                      <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1rem', textTransform: 'uppercase' }}>Especificação Técnica do Poka Yoke</h4>
+                      <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {pokaYokesDoPosto.map((py, i) => (
+                           <li key={py.PY || i}>
+                             <strong>{py.PY}:</strong> {py.Especificacao || py['DISPOSITIVO/POSTO'] || 'Dispositivo de Controle de Qualidade'}
+                           </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Falhas Evitadas */}
+                    <div style={{ borderBottom: '2px dashed var(--color-border)', paddingBottom: '1rem' }}>
+                      <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1rem', textTransform: 'uppercase' }}>Falha Evitada</h4>
+                      <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {pokaYokesDoPosto.map((py, i) => (
+                           <li key={py.PY || i}>
+                             <strong>{py.PY}:</strong> {py['Falha Evitada'] || 'Prevenção de não conformidade no processo de montagem'}
+                           </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    {/* Instruções */}
+                    <div>
+                      <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1rem', textTransform: 'uppercase' }}>Instrução PY e Status</h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {pokaYokesDoPosto.map((py, i) => (
+                           <div key={py.PY || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-bg-main)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                             <div>
+                               <p style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{py.PY}</p>
+                               <p style={{ fontSize: '0.875rem' }}>{py.Instrucao || 'Conforme padrão de trabalho da linha'}</p>
+                             </div>
+                             <span style={{ fontSize: '0.875rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '4px', backgroundColor: py['STATUS PY'] === 'FUNCIONANDO' ? '#10B981' : '#F59E0B', color: 'white', whiteSpace: 'nowrap' }}>
+                               {py['STATUS PY'] || 'FUNCIONANDO'}
+                             </span>
+                           </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Funções OK e Não OK (Procedimento Operacional) */}
+                    <div style={{ marginTop: '1rem', borderTop: '2px solid var(--color-border)', paddingTop: '2rem' }}>
+                      <h4 style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--color-text-main)', marginBottom: '1rem', textAlign: 'center' }}>
+                        Procedimento Operacional de Validação
+                      </h4>
+                      <div className="grid grid-cols-2" style={{ gap: '1.5rem' }}>
+                        {/* Função OK */}
+                        <div style={{ border: '2px solid #10B981', borderRadius: 'var(--radius-md)', padding: '1.5rem', backgroundColor: '#ECFDF5' }}>
+                          <h5 style={{ fontWeight: 800, color: '#047857', marginBottom: '0.5rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#10B981' }}></span>
+                            Ok
+                          </h5>
+                          <p style={{ color: '#065F46', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                            O sistema seguiu o parâmetro correto (Torque OK, Peça Correta, Sensor de Posição OK).
+                            <strong> Ação:</strong> Registrar o valor (se aplicável), obrigação com a montagem normal da peça e liberar para o próximo posto.
+                          </p>
+                        </div>
+                        
+                        {/* Função Não OK (NOK) */}
+                        <div style={{ border: '2px solid #EF4444', borderRadius: 'var(--radius-md)', padding: '1.5rem', backgroundColor: '#FEF2F2' }}>
+                          <h5 style={{ fontWeight: 800, color: '#B91C1C', marginBottom: '0.5rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#EF4444' }}></span>
+                            Definindo não OK (Falha)
+                          </h5>
+                          <p style={{ color: '#991B1B', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                            O dispositivo alarmou falha, falta de peça ou erro de torque. 
+                            <strong> Ação Executável:</strong> Paralisar a linha imediatamente, acionar o líder. Caso não haja um bom funcionamento, inicie o procedimento de Modo Backup e registre o evento.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+  );
+}

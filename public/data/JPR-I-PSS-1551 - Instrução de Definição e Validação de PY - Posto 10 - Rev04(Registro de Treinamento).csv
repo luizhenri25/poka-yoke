@@ -1,0 +1,85 @@
+PY-JPR-228 / PY-JPR-229 / PY-JPR-277
+Dispositivos: 		Postos: 								
+PY-JPR-228 / PY-JPR-229 / PY-JPR-277		SG10 - Posicionamento e parafusamento do correto fecho de cinto								
+Especificação Técnica do Poka Yoke:										
+										
+PY-JPR-228: Parafusadeira elétrica: Torque e ângulo fecho de cinto										
+PY-JPR-229: Dispositivo de fecho de cinto: Inversão dos fechos de cinto										
+PY-JPR-277: Painel Elétrico (CLP): CNU fecho de cinto										
+										
+Falha Evitada:										
+PY-JPR-228: Controla as características de aperto, torque e ângulo.										
+PY-JPR-229: Impede a inversão de fechos entre projetos e entre tipos de encosto (direito e esquerdo)										
+PY-JPR-277: Garante a conformidade única e a não inversão do fecho de cinto (via sistema)										
+										
+Parafusamento do fecho de cinto P13C : 49Nm (43,1 Nm á 54,9Nm)										
+Parafusamento do fecho de cinto P02H : 49Nm (43,1 Nm á 54,9Nm)										
+										
+										
+Método de Validação (Feita com a 1ª Peça do dia) - Validação PY 277:										
+										
+1. Aguardar o pallett entrar na zona de operação do posto										
+										
+1.1. As duas luzes laranja de conformidade deverão piscar devagar; (Foto 1.1)										
+										
+1.3. Ler a FOP (Foto 03)										
+										
+2. As duas luzes laranja de conformidade deverão piscar devagar; (Foto 1.1)										
+										
+3. Ler uma etiqueta de um fecho de cinto diferente do que está no pallet. (Foto 02) (repetir o processo para 2 fechos diferentes restantes, utilizando a peça coelho).										
+										
+										
+4. A luz vermelha de falha  irá acender e a luz laranja de rastreabilidade irá piscar rápido (Foto 04)										
+										
+5. Deve-se anotar que a validação está OK na Ficha de Liberação de Processo. (Foto 05)										
+										
+6. O operador deverá apertar o botão azul do painel e novamente as luzes de conformidade irão piscar devagar, permitindo  novamente a leitura do fecho de cinto . (Foto 06 e 07)										
+										
+7. Ler a etiqueta do fecho correto (Foto 03)										
+										
+8. A luz laranja de rastreabilidade deverá permanecer acesa no painel e a luz verde do dispositivo de PY ficará piscando devagar, indicando a necessidade de posicionar o fecho. (Foto 08)										
+										
+9. Deve-se anotar que a validação está OK na Ficha de Liberação de Processo. (Foto 09)										
+										
+Para P13C e P02H - Validação de PY - 229										
+										
+10. Sem poscionar o fecho de cinto na máscara,  e acionar o gatilho da parafusadeira. Parafusadeira não deve funcionar.  (Foto 10,11,12)										
+										
+11. Anotar na FLIP- validação OK (validação de inversão de fecho -  mecânica)										
+										
+22. Posicionar no dispositivo do fecho de cinto o fecho que deverá ser montado no banco do pallet.										
+										
+Validação PY - 228										
+23. A luz verde de parafusamento deverá ficar acesa no posto. (Foto 17)										
+30. Pré rosquear o parafuso do fecho de cinto, aplicar o torque e soltar o gatilho da parafusadeira antes do término do torque, no instante em que a velocidade diminuir.										
+										
+										
+31. A luz verde de parafusamento começará a piscar rapidamente, o painel de parafusadeira indicará erro e a luz vermelha deverá acender indicando torque NOK. (Foto 21) (Validação de Torque baixo no fecho de cinto).										
+										
+										
+32. Acionar o gatilho da parafusadeira, que não deverá funcionar. (Foto 22)										
+										
+29. Deve-se anotar que a validação está OK na Ficha de Liberação de Processo. (Foto 23)										
+										
+30. Com o Gap líder, acionar o desaperto virando a chave para esquerda e soltar a chave para permitir o próximo teste de parafusamento. (Foto 24)										
+										
+										
+31. Coletar a parafusadeira e aplicar o torque no parafuso do fecho de cinto que foi dado torque baixo no teste anterior. A luz verde começará a piscar rapidamente, o painel da parafusadeira indicará erro e a luz vermelha acenderá indicando torque NOK. (Foto 25) (Validação de duplo torque no fecho de cinto)										
+										
+32. Acionar o gatilho da parafusadeira, a mesma não deverá girar. (Foto 26)										
+										
+33. Deve-se anotar que a validação está OK na Ficha de Liberação de Processo. (Foto 27)										
+										
+34. O Gap líder deverá ativar o desaperto girando a chave para a esquerda, o operador deverá acionar o desaperto na parafusadeira e soltar o parafuso onde foi feito o teste de duplo torque e descartar o parafuso na caixa boca de lobo. O gap líder deverá retornar a chave para a posição central. (Fotos 28 e 29)										
+										
+35. Pré rosquear o parafuso do torque do fecho de cinto.										
+										
+36. O operador deverá acionar o pedal para liberar o banco.Banco não é liberado para próximo posto. (Validação de falta de torque Fecho de cinto) (Fotos 30 e 31)										
+										
+37. Deve-se anotar que a validação está OK na Ficha de Liberação de Processo. (Foto 32)										
+										
+38. Aplicar torque OK no parafuso.										
+										
+39. As luzes verde e laranja do painel deverão acender indicando que todas as operações foram finalizadas corretamente e o pallet passará para o próximo posto. (Foto 33)										
+										
+40. Anotar o VIS do banco da FLIP. (Foto 34)

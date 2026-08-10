@@ -1,0 +1,105 @@
+;;;;;;;;;;;;;
+LISTA DE POKA YOKES - FAS - PTR;;;;;;;;;;;;"JPR-S-PSS-0013
+Rev.04 - 09/06/2026";
+;;;;;;;;;;;;;
+;Nº ;Cliente;PY;Espcificação técnica;Falha Evitada;DISPOSITIVO/POSTO;LINHA;INSTRUÇÃO PY;S/R;STATUS PY;DATA DO STATUS;IDENTIFICAÇÂO VISUAL;CONDIÇÂO CALHA
+;1;NISSAN;PY-JPR-225;Painel Elétrico (CLP): CNF estrutura EDIA;Controla a inversão das estruturas de encostos dianteiros;POSTO 3;BDIA;JPR-I-PSS-2025 - Instrução de Definição e Validação de PY - Inversão do Encosto Dianteiro;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;2;NISSAN;PY-JPR-224;Parafusadeira Elétrica: Torque na junção EDIA/ADIA;Controla as características de aperto, torque e ângulo.P13C;POSTO 4;BDIA;(PAPEL) JPR-I-PSS-1549 - Instrução de Definição e Validação de PY - Posto 4 - Rev02;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;3;NISSAN;PY-JPR-253;Soqueteira;Controla o soquete a ser utilizado;POSTO 4;BDIA;(PAPEL) JPR-I-PSS-1549 - Instrução de Definição e Validação de PY - Posto 4 - Rev02;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;4;NISSAN;PY-JPR-254;Sensor;Controla a posição correta de parafusadeira para garantir sequencia de parafusamento. ;POSTO 4;BDIA;(PAPEL) JPR-I-PSS-1549 - Instrução de Definição e Validação de PY - Posto 4 - Rev02;SIM ;COM DERROGA;19/06/2026;OK;BOA
+;5;NISSAN;PY-JPR-265;Parafusadeira Elétrica: Torque na junção EDIA/ADIA  ;Controla as características de aperto, torque e ângulo. P02H;POSTO 4;BDIA;(PAPEL) JPR-I-PSS-1549 - Instrução de Definição e Validação de PY - Posto 4 - Rev02;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;6;NISSAN;PY-JPR-259;Concatenação - airbag ;Controla presença do Airbag dentro da bolsa. P13C/P02H;POSTO 8;BDIA;JPR-I-PSS-1954 - Instrução de PY - Concatenação Airbag;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;7;NISSAN;PY-JPR-226;Painel Elétrico (CLP): CNU Airbag;Garante a conformidade única e a não inversão do Airbag;POSTO 8;BDIA;JPR-I-PSS-1954 - Instrução de PY - Concatenação Airbag;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;8;NISSAN;PY-JPR-227;Parafusadeira elétrica: Torque Airbag;Controla as características de aperto, torque e ângulo. P13C/P02H;POSTO 9;BDIA;JPR-I-PSS-1550 - Instrução de PY - Parafusamento do AB;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;9;NISSAN;PY-JPR-282;CNF APC COM O BANCO;Controla a confomidade entre modelos de apoio de cabeça.;POSTO 9;BDIA;JPR-I-PSS-1550 - Instrução de PY - Parafusamento do AB;NÃO;COM DERROGA;19/06/2026;OK;BOA
+;10;NISSAN;PY-JPR-276;Aplicador de molicote ;Garante aplicação da quantidade necessária de molicote nas guias;POSTO 9;BDIA;JPR-I-PSS-1550 - Instrução de PY - Parafusamento do AB;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;12;NISSAN;PY-JPR-228;Parafusadeira elétrica: Torque fecho de cinto;Controla as características de aperto, torque e ângulo./P13C;POSTO 10 ;BDIA;JPR-I-PSS-1551 - Instrução de PY - Posicionamento do fecho de cinto;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;13;NISSAN;PY-JPR-229;Dispositivo de fecho de cinto: Inversão dos fechos de cinto;Impede a inversão de fechos entre projetos e entre tipos de encosto (direito e esquerdo);POSTO 10 ;BDIA;JPR-I-PSS-1551 - Instrução de PY - Posicionamento do fecho de cinto;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;14;NISSAN;PY-JPR-266;Parafusadeira elétrica: Torque e ângulo fecho de cinto;Controla as características de aperto, torque e ângulo./ P02H;POSTO 10 ;BDIA;JPR-I-PSS-1551 - Instrução de PY - Posicionamento do fecho de cinto;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;15;NISSAN;PY-JPR-277;Painel Elétrico (CLP): CNU fecho de cinto; Garante a conformidade única e a não inversão do fecho de cinto (via sistema) P13C/P02H;POSTO 10 ;BDIA;JPR-I-PSS-1551 - Instrução de PY - Posicionamento do fecho de cinto;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;16;NISSAN;PY-JPR-260;Câmera da Guia do Apoio de Cabeça;Impede a inversão da guia de apoio cabeça P13C/P02H;POSTO 11 =======> POSTO 6;BDIA;PENDENTE;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;17;NISSAN;PY-JPR-264;Câmera da rota dos chicotes ;impede o erro na rota dos chicotes P13C/P02H;POSTO 12;BDIA;PENDENTE;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;18;NISSAN;PY-JPR-231;Painel Check Elétrico: E-CHECK;Evita que o banco passe com o airbag , fecho e/ou Apoio de cabeça bose com falha P13C/P02H;IF BDIA;BDIA;JPR-I-PSS-1552- Instrução de PY - Inspeção final;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;19;NISSAN;PY-JPR-258;Painel Elétrico (CLP): Presença da etiqueta do AB;Evita enviar ao cliente banco sem a etiqueta do AB colada no carter P13C;IF BDIA;BDIA;JPR-I-PSS-1552- Instrução de PY - Inspeção final;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;20;NISSAN;PY-JPR-261;célula de carga ;evita que o banco acione com carga NOK no SBR (abaixo do especificado)P13C;IF BDIA;BDIA;JPR-I-PSS-1552- Instrução de PY - Inspeção final;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;21;NISSAN;PY-JPR-263;câmera de presença do apoio de cabeça ;impede a ausência do apoio de cabeça P13C/P02H;IF BDIA;BDIA;JPR-I-PSS-1552- Instrução de PY - Inspeção final;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;22;NISSAN;PY-JPR-232;Parafusadeira Elétrica: Torque fecho de cinto;Controla as características de aperto, torque e ângulo.;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev02;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;23;NISSAN;PY-JPR-233;Parafusadeira Elétrica: Torque Airbag;Controla as características de aperto, torque e ângulo.;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev03;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;24;NISSAN;PY-JPR-234;Parafusadeira Elétrica: Torque na Junção EDIA/ADIA;Controla as características de aperto, torque e ângulo.;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev04;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;25;NISSAN;PY-JPR-235;Soqueteira Retrabalho;Controla o soquete a ser utilizado;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev05;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;26;NISSAN;PY-JPR-236;Painel Check Elétrico: E-CHECK;Evita que o banco passe com o airbag , fecho e/ou Apoio de cabeça bose com falha;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev06;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;27;NISSAN;PY-JPR-238;Painel Elétrico (CLP): CNU Airbag;Garante a conformidade única e a não inversão do Airbag;RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev07;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;28;NISSAN;PY-JPR-262;célula de carga ;evita que o banco acione com carga NOK no SBR (abaixo do especificado);RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev08;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;29;NISSAN;PY-JPR-239;Dispositivo de fecho de cinto: Inversão dos fechos de cinto;Impede a inversão de fechos entre projetos e entre tipos de encosto (direito e esquerdo);RETRABALHO BDIA ;BDIA;(PAPEL) JPR-I-PSS-1553 - Instrução de Definição e Validação de PY - Retrabalho - Rev09;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;30;NISSAN;PY-JPR-240;Sensor de presença de estrutura - P13C;Controla presença de estrutura e confronta com código de barras lido;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev02;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;11;NISSAN;PY-JPR-272;Leitor fixo: leitura do QR enrolador ;Contola a inversão dos modelos de enrolador P02H;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev03;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;31;NISSAN;PY-JPR-243;Leitor fixo : Leitura de QR enrolador;Contola a inversão dos modelos de enrolador P13C;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev04;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;32;NISSAN;PY-JPR-245;Parafusadeira elétrica - Mola P13C;Controla características de torque e ângulo na mola P13C;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev05;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;33;NISSAN;PY-JPR-246;Parafusadeira elétrica - Enrolador P13C;Controla características de torque e ângulo no enrolador P13C;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev06;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;34;NISSAN;PY-JPR-271;sensor de presença da estrutura P02H;Controla a presença da estrutura P02H;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev07;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;35;NISSAN;PY-JPR-273;parafusadeira elétrica: latch ;Controla características de torque e ângulo do latch P02H;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev08;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;36;NISSAN;PY-JPR-274;parafusadeira elétrica: enrolador; Controla características de torque e ângulo no enrolador P02h;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev09;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;37;NISSAN;PY-JPR-275;Soqueteira ;Controla o soquete a ser utilizado;DFE015;BTR;(PAPEL)JPR-I-PSS-1554 - Instrução de Definição e Validação de PY - DFE015 - Rev10;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;38;NISSAN;PY-JPR-279;Aplicador de molicote ;Garante aplicação da quantidade necessária de molicote nas guias;POSTO 06;BTR;JPR-I-PSS-1993 - Instrução de PY - APLICADOR DE MOLICOTE;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;39;NISSAN;PY-JPR-280;Soqueteira ;Controla o soquete a ser utilizado;PIVOT PIN (POSTO 7);BTR;JPR-I-PSS-2024 Instrução de PY - PIVOT PIN/APB;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;40;NISSAN;PY-JPR-281;parafusadeira elétrica: APB ; Controla características de torque e ângulo no APB P13C;PIVOT PIN (POSTO 7);BTR;JPR-I-PSS-2024 Instrução de PY - PIVOT PIN/APB;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;41;NISSAN;PY-JPR-278;parafusadeira elétrica: Pivot Pin ;Controla características de torque e ângulo do Pivot Pin P02H;PIVOT PIN (POSTO 7);BTR;JPR-I-PSS-2024 Instrução de PY - PIVOT PIN/APB;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;42;NISSAN;PY-JPR-249;Sensor de presença da estrutura isofix: Teste isofix (IF);Controla a presença da estrutura isofix;INSPEÇÃO FINAL - P13C;BTR;JPR-I-PSS-1555 - Instrução de PY - INSPEÇÃO FINAL - P13C;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;43;NISSAN;PY-JPR-250;Dispositivo do latch: Travamento do latch (IF);Controla o travamento do latch;INSPEÇÃO FINAL - P13C;BTR;JPR-I-PSS-1555 - Instrução de PY - INSPEÇÃO FINAL - P13C;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;44;NISSAN;PY-JPR-251;Sensor de visão presença da etiqueta Top Theter: Presença da etiqueta top tether;Controla a presença e a correta posição da etiqueta Top Theter;INSPEÇÃO FINAL - P13C;BTR;JPR-I-PSS-1555 - Instrução de PY - INSPEÇÃO FINAL - P13C;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;45;NISSAN;PY-JPR-252;Camera de visão da guia / apoio de cabeça;Verifica a presença dos 3 apoios de cabeça;INSPEÇÃO FINAL - P13C;BTR;JPR-I-PSS-1555 - Instrução de PY - INSPEÇÃO FINAL - P13C;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;46;NISSAN;PY-JPR-267;Sensor de presença da estrutura isofix: teste isofix P02H;Controla a presença da estrutura isofix;INSPEÇÃO FINAL - P02H;BTR;JPR-I-PSS- 1981 - Instrução de PY - INSPEÇÃO FINAL - P02H;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;47;NISSAN;PY-JPR-268;Dispositivo do latch: Travamento do latch (IF) P02H;Controla o travamento do latch P02H;INSPEÇÃO FINAL - P02H;BTR;JPR-I-PSS- 1981 - Instrução de PY - INSPEÇÃO FINAL - P02H;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;48;NISSAN;PY-JPR-269;Sensor de visão de presença da etiqueta Top Theter P02H;Controla a presença e a correta posição da etiqueta Top Theter;INSPEÇÃO FINAL - P02H;BTR;JPR-I-PSS- 1981 - Instrução de PY - INSPEÇÃO FINAL - P02H;SIM ;FUNCIONANDO;19/06/2026;OK;BOA
+;49;NISSAN;PY-JPR-270;Sensor de presença P02H ;Verifica a presença dos 3 apoios de cabeça P02H;INSPEÇÃO FINAL - P02H;BTR;JPR-I-PSS- 1981 - Instrução de PY - INSPEÇÃO FINAL - P02H;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;50;NISSAN;PY-JPR-283;Câmera de presença do apoio de cabeça ;Controla a inversão dos modelos de APC P02H;INSPEÇÃO FINAL - P02H;BTR;JPR-I-PSS- 1981 - Instrução de PY - INSPEÇÃO FINAL - P02H;NÃO;FUNCIONANDO;19/06/2026;OK;BOA
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;
+
+;99;NISSAN;PY-JPR-228;Parafusadeira elÃ©trica: Torque e Ã¢ngulo fecho de cinto;Controla as caracterÃ­sticas de aperto, torque e Ã¢ngulo.;POSTO 10;BDIA;(PAPEL) JPR-I-PSS-1551 - InstruÃ§Ã£o de DefiniÃ§Ã£o e ValidaÃ§Ã£o de PY - Posto 10 - Rev04;SIM;FUNCIONANDO;19/06/2026;OK;BOA
+;100;NISSAN;PY-JPR-229;Dispositivo de fecho de cinto: InversÃ£o dos fechos de cinto;Impede a inversÃ£o de fechos entre projetos e entre tipos de encosto (direito e esquerdo);POSTO 10;BDIA;(PAPEL) JPR-I-PSS-1551 - InstruÃ§Ã£o de DefiniÃ§Ã£o e ValidaÃ§Ã£o de PY - Posto 10 - Rev04;SIM;FUNCIONANDO;19/06/2026;OK;BOA
+;101;NISSAN;PY-JPR-277;Painel ElÃ©trico (CLP): CNU fecho de cinto;Garante a conformidade Ãºnica e a nÃ£o inversÃ£o do fecho de cinto (via sistema);POSTO 10;BDIA;(PAPEL) JPR-I-PSS-1551 - InstruÃ§Ã£o de DefiniÃ§Ã£o e ValidaÃ§Ã£o de PY - Posto 10 - Rev04;SIM;FUNCIONANDO;19/06/2026;OK;BOA

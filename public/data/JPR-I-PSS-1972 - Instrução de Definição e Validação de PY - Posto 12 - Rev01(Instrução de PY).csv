@@ -1,0 +1,60 @@
+POKA YOKE Nº: 																								
+PY-JPR-264																								
+Dispositivos: 		Postos: 																						
+PY-JPR-264		SG12 - Câmera da rota do chicote																						
+Especificação Técnica do Poka Yoke:																								
+																								
+PY-JPR-264: câmera da rota do chicote 																								
+																								
+Falha Evitada:																								
+PY-JPR-264: Impede o erro da rota do chicote																								
+																								
+Método de Validação:
+BANCOS COM BOSE:																								
+																								
+1. Banco chega no posto de trabalho e luz verde do operator box ficará piscando.																								
+2. Operador deverá inverter a rota dos chicotes. (plugar o chicote do airbag no local do chicote bose e o chicote bose no local do chicote airbag). (foto 1)																								
+3. Posionar o banco para realizar a leitura.																								
+4 Câmera não deverá liberar o posto.(teste de validação NOK) (foto 2 )																								
+5. O operador deverá voltar os chicotes para o local correto.( Foto 3)																								
+																								
+6. Operador deverá inverter a rota dos chicotes,(plugar o chicote do fecho de cinto no local do chicote do airbag e o chicote do airbag no local do chicote do fecho de cinto.)																								
+																								
+7 Câmera não deverá liberar o posto.(foto 2)																								
+8. O operador deverá voltar os chicotes para o local correto.(foto 3)																								
+9. Operador deverá tentar posicionar um chicote no ponto 1 e não deverá ser liberado .(foto 4)																								
+10. Deve voltar o chicote para o local correto. (foto 3)																								
+11. Operador deverá tentar posicionar um chicote no ponto 2 e não deverá ser liberado. (foto 4)																								
+12. Deve voltar o chicote para o local correto. (foto 3)																								
+13. Operador deverá tentar posicionar um chicote no ponto 3 e não deverá ser liberado. (foto 4)																								
+14. Deve voltar o chicote para o local correto. (foto 3)																								
+15. Operador deverá tentar posicionar um chicote no ponto 4 e não deverá ser liberado. (foto 4)																								
+16. Deve voltar o chicote para o local correto. (foto 3)																								
+17. Deve-se anotar que a validação da rota dos chicotes está OK na Ficha de Liberação de Processo.(foto 4)																								
+BANCOS SEM BOSE:																								
+1. Banco chega no posto de trabalho e luz verde do operator box ficará piscando. 																								
+6. Operador deverá inverter a rota dos chicotes,(plugar o chicote do fecho de cinto no local do chicote do airbag e o chicote do airbag no local do chicote do fecho de cinto.)																								
+3. Posionar o banco para realizar a leitura.																								 
+4 Câmera não deverá liberar o posto.(teste de validação NOK) (foto 6)																								
+5. O operador deverá voltar os chicotes para o local correto.																								
+8. Operador deverá tentar posicionar um chicote no ponto 1 e não deverá ser liberado .(foto 6)																								
+9. Deve voltar o chicote para o local correto. (foto 3)																								
+10. Operador deverá tentar posicionar um chicote no ponto 2 e não deverá ser liberado .(foto 6)																								
+11. Deve voltar o chicote para o local correto. (foto 3)																								
+12. Operador deverá tentar posicionar um chicote no ponto 3 e não deverá ser liberado .(foto 6)																								
+13. Deve voltar o chicote para o local correto. (foto 3)																								
+14. Operador deverá tentar posicionar um chicote no ponto 4 e não deverá ser liberado .(foto 6)																								
+15. Deve voltar o chicote para o local correto. (foto 3)																								
+16. Operador deverá tentar posicionar um chicote no ponto 5 e não deverá ser liberado .(foto 6)                                																								
+17. Deve voltar o chicote para o local correto. (foto 3)																								
+																								
+18. Deve-se anotar que a validação da rota dos chicotes está OK na Ficha de Liberação de Processo.(foto 4)																								
+                                																								
+																								
+P02H:																								
+1. Coletar o chicote do fecho de cinto e inverter com o chicote do airbag																								
+2. Operador deve apertar o peda. Banco não pode passar para o proximo posto. (Validação do erro da rota do chicote OK).																								
+3. Colocar os chicotes na posição correta.																								
+4. A luz verde ficará acesa no posto indicando processo OK																								
+5. Anotar na liberação de processo (resultado OK).																								
+6. Acionar pedal e o banco é liberado
