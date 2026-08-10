@@ -42,41 +42,42 @@ export default function Login() {
       padding: '1.5rem',
       gap: '2rem'
     }}>
-      {/* BONECO PEQUENO ACENANDO NA LATERAL DA TELA DE LOGIN */}
+      {/* BONECO 3D MAIOR SEM FUNDO (BONECO2.MP4) NA LATERAL DA TELA DE LOGIN */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0.75rem',
+        gap: '1rem',
         position: 'relative'
       }}>
-        {/* Balão de Fala Pequeno */}
+        {/* Balão de Fala do Assistente */}
         <div style={{
           backgroundColor: 'white',
           border: '2px solid var(--color-primary)',
-          borderRadius: '12px',
-          padding: '0.6rem 0.85rem',
-          boxShadow: 'var(--shadow-sm)',
-          fontSize: '0.75rem',
-          fontWeight: 700,
+          borderRadius: '16px',
+          padding: '0.85rem 1.15rem',
+          boxShadow: 'var(--shadow-md)',
+          fontSize: '0.85rem',
+          fontWeight: 800,
           color: 'var(--color-primary-dark)',
           textAlign: 'center',
-          maxWidth: '150px',
-          lineHeight: '1.3'
+          maxWidth: '220px',
+          lineHeight: '1.4',
+          borderBottomLeftRadius: '4px'
         }}>
-          Olá! 👋 Faça seu login para acessar o POKA-YOKE
+          Olá! 👋 Seja bem-vindo ao POKA-YOKE. Faça seu login ao lado!
         </div>
 
-        {/* Vídeo do Boneco em Tamanho Pequeno */}
+        {/* Vídeo Maior do Boneco sem Fundo (boneco2.mp4) */}
         <div style={{
-          width: '110px',
-          height: '160px',
+          width: '220px',
+          height: '340px',
           display: 'flex',
           justify: 'center',
           alignItems: 'center'
         }}>
           <video
-            src="/video_boneco.mp4"
+            src="/boneco2.mp4"
             autoPlay
             loop
             muted
@@ -85,8 +86,7 @@ export default function Login() {
               width: '100%',
               height: '100%',
               objectFit: 'contain',
-              borderRadius: '12px',
-              filter: 'drop-shadow(0px 6px 12px rgba(0, 0, 0, 0.12))'
+              filter: 'drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.15))'
             }}
           />
         </div>
