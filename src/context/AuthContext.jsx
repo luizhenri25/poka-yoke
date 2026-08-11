@@ -93,17 +93,50 @@ export function AuthProvider({ children }) {
     }
   }, [currentUser]);
 
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState(null);
+
   const login = (identifier, password) => {
+    const now = Date.now();
+
+    // Checar se há bloqueio ativo (Rate Limiting de Pentest)
+    if (lockoutUntil && now < lockoutUntil) {
+      const secondsLeft = Math.ceil((lockoutUntil - now) / 1000);
+      return { 
+        success: false, 
+        error: `🚨 Bloqueio de Segurança Pentest: Muitas tentativas incorretas. Aguarde ${secondsLeft} segundos antes de tentar novamente.` 
+      };
+    }
+
     const term = identifier.trim().toLowerCase();
     const user = usersList.find(u => 
       (u.email.toLowerCase() === term || u.matricula.toLowerCase() === term) && u.password === password
     );
 
     if (user) {
+      setFailedAttempts(0);
+      setLockoutUntil(null);
       setCurrentUser(user);
       return { success: true, user };
     }
-    return { success: false, error: 'Matrícula/E-mail ou senha incorretos.' };
+
+    // Incrementar tentativas incorretas (Bloqueio no 5º intento por 60 segundos)
+    const newCount = failedAttempts + 1;
+    setFailedAttempts(newCount);
+
+    if (newCount >= 5) {
+      const lockTime = Date.now() + 60000;
+      setLockoutUntil(lockTime);
+      return {
+        success: false,
+        error: '🚨 Bloqueio de Segurança Pentest: 5 tentativas incorretas atingidas. Sistema bloqueado por 60 segundos.'
+      };
+    }
+
+    return { 
+      success: false, 
+      error: `Matrícula/E-mail ou senha incorretos. (Tentativa ${newCount} de 5 antes do bloqueio de segurança)` 
+    };
   };
 
   const logout = () => {

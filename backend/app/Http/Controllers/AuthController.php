@@ -8,12 +8,13 @@ use App\Enums\UserPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     /**
-     * Autenticação de Usuário (E-mail ou Matrícula)
+     * Autenticação de Usuário com Proteção Anti-Força Bruta (RateLimiter - Max 5 Tentativas/Minuto)
      */
     public function login(Request $request)
     {
@@ -22,17 +23,34 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $identifier = trim($request->identifier);
+        $identifier = strtolower(trim($request->identifier));
+        $throttleKey = 'login-attempts:' . $request->ip() . '|' . $identifier;
+
+        // Verificar limite de tentativas (Máximo 5 tentativas por minuto)
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                'error' => 'RateLimitExceeded',
+                'message' => "🚨 Bloqueio de Segurança Pentest: Muitas tentativas de login incorretas. Por favor, aguarde {$seconds} segundos antes de tentar novamente.",
+                'retry_after_seconds' => $seconds
+            ], 429);
+        }
 
         $user = User::where('email', $identifier)
             ->orWhere('matricula', $identifier)
             ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Contabilizar tentativa com falha
+            RateLimiter::hit($throttleKey, 60);
+
             throw ValidationException::withMessages([
                 'identifier' => ['Matrícula ou E-mail incorretos.'],
             ]);
         }
+
+        // Sucesso: Limpar histórico de bloqueio de força bruta
+        RateLimiter::clear($throttleKey);
 
         return response()->json([
             'message' => 'Autenticado com sucesso!',
