@@ -68,27 +68,25 @@ export default function Login() {
           Olá! 👋 Seja bem-vindo ao POKA-YOKE. Faça seu login ao lado!
         </div>
 
-        {/* Vídeo do Boneco com Recorte Justo (Apenas o Boneco em Foco Grande) */}
+        {/* Vídeo do Boneco Correto (boneco-correto.mp4) */}
         <div style={{
           width: '260px',
           height: '390px',
-          overflow: 'hidden',
           display: 'flex',
           justify: 'center',
           alignItems: 'center',
           position: 'relative'
         }}>
           <video
-            src="/boneco2.mp4"
+            src="/boneco-correto.mp4"
             autoPlay
             loop
             muted
             playsInline
             style={{
-              width: '145%',
-              height: '145%',
-              objectFit: 'cover',
-              objectPosition: 'center 35%',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
               filter: 'drop-shadow(0px 10px 22px rgba(0, 0, 0, 0.18))'
             }}
           />
