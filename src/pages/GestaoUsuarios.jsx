@@ -276,7 +276,8 @@ export default function GestaoUsuarios() {
                         )}
                       </td>
                     </tr>
-                  ))}
+                  )))
+                }
                 </tbody>
               </table>
             </div>
