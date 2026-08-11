@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPokaYokesData, fetchInstrucoesList } from '../utils/csvParser';
 import SignatureCanvasModal from './SignatureCanvasModal';
+import AnimatedCharacterCanvas from './AnimatedCharacterCanvas';
 import { 
   Activity, 
   CheckCircle2, 
@@ -151,7 +152,7 @@ export default function DashboardCentral() {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* Cabeçalho do Dashboard Central */}
+      {/* Cabeçalho do Dashboard Central com o Boneco Animado em Canvas */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
@@ -162,18 +163,30 @@ export default function DashboardCentral() {
         border: '1px solid var(--color-border)',
         boxShadow: 'var(--shadow-sm)',
         flexWrap: 'wrap',
-        gap: '1rem'
+        gap: '1.5rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ padding: '0.85rem', backgroundColor: 'rgba(10, 27, 159, 0.08)', borderRadius: 'var(--radius-md)' }}>
-            <Activity size={30} color="var(--color-primary)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: '300px' }}>
+          
+          {/* BONECO ANIMADO CANVAS NA TELA INICIAL */}
+          <div style={{ flexShrink: 0 }}>
+            <AnimatedCharacterCanvas height={155} width={140} defaultAnim="waving" />
           </div>
+
           <div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+              <div style={{ padding: '0.4rem', backgroundColor: 'rgba(10, 27, 159, 0.08)', borderRadius: 'var(--radius-md)' }}>
+                <Activity size={22} color="var(--color-primary)" />
+              </div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Sistema POKA-YOKE — Porto Real
+              </span>
+            </div>
+
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0, lineHeight: '1.2' }}>
               Dashboard Central do Processista
             </h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
-              Monitoramento em tempo real do status dos Poka-Yokes (Rev05) & Gestão Digital de Treinamentos
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: '0.4rem', margin: 0 }}>
+              Monitoramento em tempo real do status dos Poka-Yokes (Rev05) & Gestão Digital de Treinamentos.
             </p>
           </div>
         </div>
