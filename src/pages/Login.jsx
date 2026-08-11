@@ -112,10 +112,10 @@ export default function Login() {
             borderRadius: '50%',
             backgroundColor: 'rgba(10, 27, 159, 0.08)',
             color: 'var(--color-primary)',
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            justify: 'center',
-            marginBottom: '1rem'
+            justifyContent: 'center',
+            margin: '0 auto 1rem'
           }}>
             <Lock size={32} color="var(--color-primary)" />
           </div>
