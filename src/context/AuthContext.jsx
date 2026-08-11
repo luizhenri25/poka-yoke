@@ -2,14 +2,54 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// Usuários Pré-Cadastrados no Sistema (Sincronizados com o Backend Laravel)
+// PHP Backed Enums Sincronizados com o Backend Laravel (App\Enums\UserRole)
+export const UserRole = {
+  ADMIN: 'admin',
+  ENGENHEIRO: 'engenheiro',
+  OPERADOR: 'operador'
+};
+
+// PHP Backed Enums Sincronizados com o Backend Laravel (App\Enums\UserPermission)
+export const UserPermission = {
+  VIEW_INSTRUCTIONS: 'view_instructions',
+  SIGN_TRAINING: 'sign_training',
+  MANAGE_POKA_YOKES: 'manage_poka_yokes',
+  MANAGE_USERS: 'manage_users',
+  VIEW_ANALYTICS: 'view_analytics',
+  GENERATE_DOCUMENTS: 'generate_documents'
+};
+
+// Mapeamento de Permissões por Perfil (Sincronizado com App\Enums\UserRole::permissions())
+const ROLE_PERMISSIONS = {
+  [UserRole.ADMIN]: [
+    UserPermission.VIEW_INSTRUCTIONS,
+    UserPermission.SIGN_TRAINING,
+    UserPermission.MANAGE_POKA_YOKES,
+    UserPermission.MANAGE_USERS,
+    UserPermission.VIEW_ANALYTICS,
+    UserPermission.GENERATE_DOCUMENTS
+  ],
+  [UserRole.ENGENHEIRO]: [
+    UserPermission.VIEW_INSTRUCTIONS,
+    UserPermission.SIGN_TRAINING,
+    UserPermission.MANAGE_POKA_YOKES,
+    UserPermission.VIEW_ANALYTICS,
+    UserPermission.GENERATE_DOCUMENTS
+  ],
+  [UserRole.OPERADOR]: [
+    UserPermission.VIEW_INSTRUCTIONS,
+    UserPermission.SIGN_TRAINING
+  ]
+};
+
+// Usuários Pré-Cadastrados no Sistema (Sincronizados com o Backend Laravel DatabaseSeeder)
 export const DEFAULT_USERS = [
   {
     id: 1,
     name: 'Administrador Geral (Forvia)',
     email: 'admin@faurecia.com',
     matricula: 'ADM-001',
-    role: 'admin',
+    role: UserRole.ADMIN,
     password: 'admin123'
   },
   {
@@ -17,7 +57,7 @@ export const DEFAULT_USERS = [
     name: 'Caio Cabral (Eng. Processos)',
     email: 'caio.cabral@faurecia.com',
     matricula: 'ENG-102',
-    role: 'engenheiro',
+    role: UserRole.ENGENHEIRO,
     password: 'eng123'
   },
   {
@@ -25,7 +65,7 @@ export const DEFAULT_USERS = [
     name: 'Luiz Henrique (Operador BDIA)',
     email: 'luiz.henrique@faurecia.com',
     matricula: 'OP-504',
-    role: 'operador',
+    role: UserRole.OPERADOR,
     password: 'op123'
   }
 ];
@@ -83,10 +123,16 @@ export function AuthProvider({ children }) {
     setUsersList(prev => prev.filter(u => u.id !== id));
   };
 
-  // Helper de Permissão
-  const isAdmin = currentUser?.role === 'admin';
-  const isEngenheiro = currentUser?.role === 'engenheiro' || currentUser?.role === 'admin';
-  const isOperador = currentUser?.role === 'operador';
+  // Helper de Permissão Baseado nos Enums Laravel
+  const hasPermission = (permission) => {
+    if (!currentUser?.role) return false;
+    const permissions = ROLE_PERMISSIONS[currentUser.role] || [];
+    return permissions.includes(permission);
+  };
+
+  const isAdmin = currentUser?.role === UserRole.ADMIN;
+  const isEngenheiro = currentUser?.role === UserRole.ENGENHEIRO || currentUser?.role === UserRole.ADMIN;
+  const isOperador = currentUser?.role === UserRole.OPERADOR;
 
   return (
     <AuthContext.Provider value={{
@@ -96,9 +142,12 @@ export function AuthProvider({ children }) {
       logout,
       addUser,
       removeUser,
+      hasPermission,
       isAdmin,
       isEngenheiro,
-      isOperador
+      isOperador,
+      UserRole,
+      UserPermission
     }}>
       {children}
     </AuthContext.Provider>
