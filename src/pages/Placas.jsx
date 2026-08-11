@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, FileImage, Download, ChevronRight } from 'lucide-react';
+import { AlertCircle, FileImage, Download, ChevronRight, Edit3, ShieldCheck, RotateCcw } from 'lucide-react';
 import { fetchPokaYokesData } from '../utils/csvParser';
+import { useAuth } from '../context/AuthContext';
+import EditPlacaModal from '../components/EditPlacaModal';
 
 const BDIA_POSTOS = [
   'POSTO 3', 'POSTO 4', 'POSTO 6', 'POSTO 8', 'POSTO 9', 'POSTO 10', 'POSTO 12', 'IF BDIA', 'RETRABALHO'
@@ -11,11 +13,22 @@ const BTR_POSTOS = [
 ];
 
 export default function Placas() {
+  const { isEngenheiro } = useAuth();
   const [activeTab, setActiveTab] = useState('BDIA');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPosto, setSelectedPosto] = useState('');
-  const [placaPronta, setPlacaPronta] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Armazenamento de edições de engenharia persistidas em localStorage
+  const [customEdits, setCustomEdits] = useState(() => {
+    const saved = localStorage.getItem('poka_yoke_placas_edits');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem('poka_yoke_placas_edits', JSON.stringify(customEdits));
+  }, [customEdits]);
 
   useEffect(() => {
     async function loadData() {
@@ -43,6 +56,24 @@ export default function Placas() {
     
     return normalize(postoItem) === normalize(postoFiltro) || normalize(postoItem).includes(normalize(postoFiltro));
   });
+
+  const postoKey = `${activeTab}_${selectedPosto}`;
+  const currentCustomEdit = customEdits[postoKey] || null;
+
+  const handleSaveEdits = (updatedData) => {
+    setCustomEdits(prev => ({
+      ...prev,
+      [postoKey]: updatedData
+    }));
+  };
+
+  const handleResetDefault = () => {
+    setCustomEdits(prev => {
+      const copy = { ...prev };
+      delete copy[postoKey];
+      return copy;
+    });
+  };
 
   if (loading) {
     return <div className="card text-center"><p>Carregando dados das placas...</p></div>;
@@ -103,18 +134,48 @@ export default function Placas() {
           ) : (
             <div style={{ border: '2px solid var(--color-primary)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', backgroundColor: 'var(--color-bg-card)', boxShadow: 'var(--shadow-md)' }}>
               {/* Cabeçalho da Placa Simulando Documento */}
-              <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '1rem', textAlign: 'center' }}>
-                <h3 style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                  Folha de Definição e Validação - Poka Yoke
-                </h3>
-                <p style={{ fontWeight: 600, marginTop: '0.5rem' }}>LINHA: {activeTab} | POSTO: {selectedPosto}</p>
+              <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h3 style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>
+                    Folha de Definição e Validação - Poka Yoke
+                  </h3>
+                  <p style={{ fontWeight: 600, marginTop: '0.25rem', margin: 0, opacity: 0.9 }}>
+                    LINHA: {activeTab} | POSTO: {selectedPosto}
+                  </p>
+                </div>
+
+                {isEngenheiro && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setIsEditModalOpen(true)}
+                    style={{ backgroundColor: 'white', color: 'var(--color-primary-dark)', fontWeight: 800, padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', boxShadow: 'var(--shadow-sm)' }}
+                  >
+                    <Edit3 size={16} /> <span>Editar Placa Poka-Yoke</span>
+                  </button>
+                )}
               </div>
+
+              {/* Tag de Revisão Editada pela Engenharia */}
+              {currentCustomEdit && (
+                <div style={{ backgroundColor: '#EEF2FF', borderBottom: '1px solid #C7D2FE', padding: '0.65rem 1.5rem', fontSize: '0.8rem', color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700 }}>
+                    <ShieldCheck size={16} color="var(--color-primary)" />
+                    Placa Poka-Yoke Editada pela Engenharia de Processos ({currentCustomEdit.editadoPor} em {currentCustomEdit.dataEdicao})
+                  </div>
+                  <button 
+                    onClick={handleResetDefault}
+                    style={{ backgroundColor: 'transparent', border: 'none', color: '#6366F1', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Restaurar Padrão de Fábrica
+                  </button>
+                </div>
+              )}
 
               <div style={{ padding: '2rem' }}>
                 {pokaYokesDoPosto.length === 0 ? (
                   <p className="text-muted text-center">Nenhum Poka-Yoke registrado no sistema para este posto.</p>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '0.5rem' }}>
         
                     {/* Lista de Poka Yokes */}
                     <div style={{ borderBottom: '2px dashed var(--color-border)', paddingBottom: '1rem' }}>
@@ -134,7 +195,7 @@ export default function Placas() {
                       <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {pokaYokesDoPosto.map((py, i) => (
                            <li key={py.PY || i}>
-                             <strong>{py.PY}:</strong> {py.Especificacao || py['DISPOSITIVO/POSTO'] || 'Dispositivo de Controle de Qualidade'}
+                             <strong>{py.PY}:</strong> {currentCustomEdit?.especificacao || py.Especificacao || py['DISPOSITIVO/POSTO'] || 'Dispositivo de Controle de Qualidade'}
                            </li>
                         ))}
                       </ul>
@@ -146,7 +207,7 @@ export default function Placas() {
                       <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {pokaYokesDoPosto.map((py, i) => (
                            <li key={py.PY || i}>
-                             <strong>{py.PY}:</strong> {py['Falha Evitada'] || 'Prevenção de não conformidade no processo de montagem'}
+                             <strong>{py.PY}:</strong> {currentCustomEdit?.falhaEvitada || py['Falha Evitada'] || 'Prevenção de não conformidade no processo de montagem'}
                            </li>
                         ))}
                       </ul>
@@ -156,17 +217,28 @@ export default function Placas() {
                     <div>
                       <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1rem', textTransform: 'uppercase' }}>Instrução PY e Status</h4>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {pokaYokesDoPosto.map((py, i) => (
-                           <div key={py.PY || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-bg-main)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-                             <div>
-                               <p style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{py.PY}</p>
-                               <p style={{ fontSize: '0.875rem' }}>{py.Instrucao || 'Conforme padrão de trabalho da linha'}</p>
-                             </div>
-                             <span style={{ fontSize: '0.875rem', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '4px', backgroundColor: py['STATUS PY'] === 'FUNCIONANDO' ? '#10B981' : '#F59E0B', color: 'white', whiteSpace: 'nowrap' }}>
-                               {py['STATUS PY'] || 'FUNCIONANDO'}
-                             </span>
-                           </div>
-                        ))}
+                        {pokaYokesDoPosto.map((py, i) => {
+                          const statusFinal = currentCustomEdit?.statusPY || py['STATUS PY'] || 'FUNCIONANDO';
+                          return (
+                            <div key={py.PY || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-bg-main)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                              <div>
+                                <p style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{py.PY}</p>
+                                <p style={{ fontSize: '0.875rem' }}>{currentCustomEdit?.instrucao || py.Instrucao || 'Conforme padrão de trabalho da linha'}</p>
+                              </div>
+                              <span style={{ 
+                                fontSize: '0.875rem', 
+                                fontWeight: 800, 
+                                padding: '0.3rem 0.65rem', 
+                                borderRadius: '4px', 
+                                backgroundColor: statusFinal === 'FUNCIONANDO' ? '#10B981' : statusFinal === 'EM MANUTENÇÃO' ? '#F59E0B' : '#EF4444', 
+                                color: 'white', 
+                                whiteSpace: 'nowrap' 
+                              }}>
+                                {statusFinal}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -183,8 +255,7 @@ export default function Placas() {
                             Ok
                           </h5>
                           <p style={{ color: '#065F46', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                            O sistema seguiu o parâmetro correto (Torque OK, Peça Correta, Sensor de Posição OK).
-                            <strong> Ação:</strong> Registrar o valor (se aplicável), obrigação com a montagem normal da peça e liberar para o próximo posto.
+                            {currentCustomEdit?.procedimentoOK || 'O sistema seguiu o parâmetro correto (Torque OK, Peça Correta, Sensor de Posição OK). Ação: Registrar o valor (se aplicável), obrigação com a montagem normal da peça e liberar para o próximo posto.'}
                           </p>
                         </div>
                         
@@ -195,8 +266,7 @@ export default function Placas() {
                             Definindo não OK (Falha)
                           </h5>
                           <p style={{ color: '#991B1B', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                            O dispositivo alarmou falha, falta de peça ou erro de torque. 
-                            <strong> Ação Executável:</strong> Paralisar a linha imediatamente, acionar o líder. Caso não haja um bom funcionamento, inicie o procedimento de Modo Backup e registre o evento.
+                            {currentCustomEdit?.procedimentoNOK || 'O dispositivo alarmou falha, falta de peça ou erro de torque. Ação Executável: Paralisar a linha imediatamente, acionar o líder. Caso não haja um bom funcionamento, inicie o procedimento de Modo Backup e registre o evento.'}
                           </p>
                         </div>
                       </div>
@@ -208,6 +278,25 @@ export default function Placas() {
             </div>
           )}
         </div>
+
+      {/* Modal de Edição de Placa Poka-Yoke pela Engenharia */}
+      <EditPlacaModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveEdits}
+        onResetDefault={handleResetDefault}
+        postoName={selectedPosto}
+        linhaName={activeTab}
+        currentPlacaData={{
+          especificacao: currentCustomEdit?.especificacao || pokaYokesDoPosto[0]?.Especificacao || pokaYokesDoPosto[0]?.['DISPOSITIVO/POSTO'] || '',
+          falhaEvitada: currentCustomEdit?.falhaEvitada || pokaYokesDoPosto[0]?.['Falha Evitada'] || '',
+          instrucao: currentCustomEdit?.instrucao || pokaYokesDoPosto[0]?.Instrucao || '',
+          statusPY: currentCustomEdit?.statusPY || pokaYokesDoPosto[0]?.['STATUS PY'] || 'FUNCIONANDO',
+          procedimentoOK: currentCustomEdit?.procedimentoOK || 'O sistema seguiu o parâmetro correto (Torque OK, Peça Correta, Sensor de Posição OK). Ação: Registrar o valor (se aplicável), obrigação com a montagem normal da peça e liberar para o próximo posto.',
+          procedimentoNOK: currentCustomEdit?.procedimentoNOK || 'O dispositivo alarmou falha, falta de peça ou erro de torque. Ação Executável: Paralisar a linha imediatamente, acionar o líder. Caso não haja um bom funcionamento, inicie o procedimento de Modo Backup e registre o evento.'
+        }}
+      />
+
       </div>
   );
 }
