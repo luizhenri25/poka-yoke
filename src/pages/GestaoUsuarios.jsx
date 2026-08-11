@@ -9,11 +9,24 @@ import {
   Trash2, 
   CheckCircle2, 
   AlertCircle,
-  Key
+  Key,
+  Search
 } from 'lucide-react';
 
 export default function GestaoUsuarios() {
   const { usersList, addUser, removeUser, currentUser, isAdmin } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredUsers = usersList.filter(u => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.matricula && u.matricula.toLowerCase().includes(q)) ||
+      u.role.toLowerCase().includes(q)
+    );
+  });
 
   const [formData, setFormData] = useState({
     name: '',
@@ -186,9 +199,24 @@ export default function GestaoUsuarios() {
         {/* TABELA DE USUÁRIOS CADASTRADOS */}
         <div style={{ gridColumn: 'span 2' }}>
           <div className="card" style={{ padding: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '1.25rem' }}>
-              Contas de Acesso Cadastradas ({usersList.length})
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
+                Contas de Acesso Cadastradas ({filteredUsers.length} de {usersList.length})
+              </h3>
+
+              {/* Lupa de Pesquisa 🔍 */}
+              <div style={{ position: 'relative', width: '260px' }}>
+                <Search size={16} color="var(--color-primary)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
+                <input
+                  type="text"
+                  placeholder="Pesquisar por nome, e-mail, matrícula..."
+                  className="input-field"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ paddingLeft: '2.2rem', fontSize: '0.85rem', width: '100%', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
 
             <div style={{ overflowX: 'auto', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
@@ -201,7 +229,14 @@ export default function GestaoUsuarios() {
                   </tr>
                 </thead>
                 <tbody>
-                  {usersList.map((user) => (
+                  {filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                        Nenhum usuário encontrado para a busca "{searchQuery}".
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredUsers.map((user) => (
                     <tr key={user.id} style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'white' }}>
                       <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
                         {user.name} {user.id === currentUser?.id && ' (Você)'}

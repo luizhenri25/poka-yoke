@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, FileImage, Download, ChevronRight, Edit3, ShieldCheck, RotateCcw } from 'lucide-react';
+import { AlertCircle, FileImage, Download, ChevronRight, Edit3, ShieldCheck, RotateCcw, Search } from 'lucide-react';
 import { fetchPokaYokesData } from '../utils/csvParser';
 import { useAuth } from '../context/AuthContext';
 import EditPlacaModal from '../components/EditPlacaModal';
@@ -19,6 +19,10 @@ export default function Placas() {
   const [loading, setLoading] = useState(true);
   const [selectedPosto, setSelectedPosto] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [searchPosto, setSearchPosto] = useState('');
+
+  const postos = activeTab === 'BDIA' ? BDIA_POSTOS : BTR_POSTOS;
+  const filteredPostos = postos.filter(p => p.toLowerCase().includes(searchPosto.toLowerCase().trim()));
 
   // Armazenamento de edições de engenharia persistidas em localStorage
   const [customEdits, setCustomEdits] = useState(() => {
@@ -38,8 +42,6 @@ export default function Placas() {
     }
     loadData();
   }, []);
-
-  const postos = activeTab === 'BDIA' ? BDIA_POSTOS : BTR_POSTOS;
 
   // Filtra de forma mais flexível para evitar problemas com espaços e nomes diferentes na planilha mestre
   const pokaYokesDoPosto = data.filter(item => {
@@ -83,31 +85,45 @@ export default function Placas() {
     <div className="page-grid">
       {/* Sidebar - Selecione o Posto */}
       <div className="card" style={{ padding: 0, overflow: 'hidden', height: 'fit-content' }}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, margin: 0 }}>Selecione o Posto</h2>
             <span style={{ backgroundColor: 'var(--color-bg-main)', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.75rem', borderRadius: 'var(--radius-full)' }}>
-              {postos.length} Ativos
+              {filteredPostos.length} Ativos
             </span>
           </div>
-          <div className="segmented-control">
+
+          <div className="segmented-control" style={{ margin: 0 }}>
             <button 
               className={`segmented-btn ${activeTab === 'BDIA' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('BDIA'); setSelectedPosto(''); setPlacaPronta(false); }}
+              onClick={() => { setActiveTab('BDIA'); setSelectedPosto(''); }}
             >
               BDIA
             </button>
             <button 
               className={`segmented-btn ${activeTab === 'BTR' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('BTR'); setSelectedPosto(''); setPlacaPronta(false); }}
+              onClick={() => { setActiveTab('BTR'); setSelectedPosto(''); }}
             >
               BTR
             </button>
           </div>
+
+          {/* Lupa de Pesquisa de Postos 🔍 */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <Search size={15} color="var(--color-primary)" style={{ position: 'absolute', left: '0.65rem', top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              type="text"
+              className="input-field"
+              placeholder="Filtrar posto (ex: Posto 3)..."
+              value={searchPosto}
+              onChange={(e) => setSearchPosto(e.target.value)}
+              style={{ paddingLeft: '2rem', fontSize: '0.8rem', width: '100%', boxSizing: 'border-box' }}
+            />
+          </div>
         </div>
         
         <div className="sidebar-list">
-          {postos.map((posto, idx) => (
+          {filteredPostos.map((posto, idx) => (
             <button 
               key={posto || idx}
               className={`posto-item ${selectedPosto === posto ? 'active' : ''}`}
