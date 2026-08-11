@@ -1,10 +1,25 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Edit3, RotateCcw, Check, X, ShieldCheck } from 'lucide-react';
 
-export default function SignatureCanvasModal({ isOpen, onClose, onSave, operatorName, postoName }) {
+export default function SignatureCanvasModal({ isOpen, onClose, onSave, operatorName, postoName, categoryName = 'LIBERAÇÃO DE POKA-YOKE', lineName = 'BDIA' }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      const updateClock = () => {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('pt-BR');
+        const timeStr = now.toLocaleTimeString('pt-BR');
+        setCurrentDateTime(`${dateStr} ${timeStr}`);
+      };
+      updateClock();
+      const interval = setInterval(updateClock, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && canvasRef.current) {
@@ -126,7 +141,7 @@ export default function SignatureCanvasModal({ isOpen, onClose, onSave, operator
         
         {/* Cabeçalho do Modal */}
         <div style={{
-          backgroundColor: 'var(--color-primary)',
+          backgroundColor: '#0A1B9F',
           color: 'white',
           padding: '1.25rem 1.5rem',
           display: 'flex',
@@ -134,12 +149,20 @@ export default function SignatureCanvasModal({ isOpen, onClose, onSave, operator
           alignItems: 'center'
         }}>
           <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: '0.15rem 0.5rem', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 800 }}>
+                {categoryName}
+              </span>
+              <span style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', padding: '0.15rem 0.5rem', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 800 }}>
+                {lineName}
+              </span>
+            </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Edit3 size={20} />
-              Assinatura Digital com o Dedo
+              Assinatura Digital — Operador {operatorName}
             </h3>
-            <p style={{ fontSize: '0.8rem', color: '#E2E8F0', margin: 0, marginTop: '0.2rem' }}>
-              Operador: <strong>{operatorName}</strong> ({postoName})
+            <p style={{ fontSize: '0.8rem', color: '#E2E8F0', margin: 0, marginTop: '0.25rem' }}>
+              {postoName} • 🕒 <strong>{currentDateTime}</strong>
             </p>
           </div>
           <button 
@@ -161,9 +184,10 @@ export default function SignatureCanvasModal({ isOpen, onClose, onSave, operator
             padding: '0.65rem 1rem',
             borderRadius: 'var(--radius-md)',
             width: '100%',
-            border: '1px solid #E2E8F0'
+            border: '1px solid #E2E8F0',
+            boxSizing: 'border-box'
           }}>
-            ✍️ <strong>Desenhe sua rubrica abaixo</strong> com o dedo no celular/tablet ou usando o mouse.
+            ✍️ <strong>Assine com o Dedo (Celular/Touch) ou com o Mouse</strong> no quadro abaixo.
           </div>
 
           {/* Quadro do Canvas */}
