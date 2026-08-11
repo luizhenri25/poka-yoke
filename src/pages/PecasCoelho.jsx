@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Rabbit, CheckCircle, AlertTriangle, Clock, ShieldAlert, Calendar, CheckCircle2, Wrench, MapPin, Mail, Send, Check } from 'lucide-react';
 import { pecasCoelhoData, pecasCoelhoControleMensal as initialControleData } from '../data/pecasCoelhoData';
+import EmailRecipientSelectorModal from '../components/EmailRecipientSelectorModal';
 
 export default function PecasCoelho() {
   const [mainTab, setMainTab] = useState('INVENTARIO'); // 'INVENTARIO' ou 'CONTROLE_MENSAL'
@@ -8,6 +9,7 @@ export default function PecasCoelho() {
   const [controleList, setControleList] = useState(initialControleData);
   const [emailStatus, setEmailStatus] = useState(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showRecipientModal, setShowRecipientModal] = useState(false);
 
   const inventarioData = pecasCoelhoData[linhaTab] || [];
 
@@ -35,13 +37,19 @@ export default function PecasCoelho() {
     }));
   };
 
-  const handleSendEmailAlerts = async () => {
+  const handleSendEmailAlerts = () => {
     const expiring = controleList.filter(item => item.status === 'Vencendo em Breve' || item.status === 'Vencido');
     
     if (expiring.length === 0) {
       alert("Todas as peças Coelho estão em dia! Nenhuma notificação por e-mail necessária no momento.");
       return;
     }
+    setShowRecipientModal(true);
+  };
+
+  const executeSendEmail = async (selectedRecipients) => {
+    setShowRecipientModal(false);
+    const expiring = controleList.filter(item => item.status === 'Vencendo em Breve' || item.status === 'Vencido');
 
     try {
       // Chamada para o Backend API Laravel (App\Http\Controllers\NotificationController)
@@ -56,13 +64,13 @@ export default function PecasCoelho() {
             ultimaInspecao: item.ultimaVerificacao,
             diasRestantes: item.status === 'Vencido' ? -3 : 4
           })),
-          recipients: ['caio.cabral@faurecia.com', 'anna.julia@faurecia.com', 'admin@faurecia.com']
+          recipients: selectedRecipients
         })
       });
 
       const resData = await response.json();
       setEmailStatus({
-        recipients: ['caio.cabral@faurecia.com', 'anna.julia@faurecia.com', 'admin@faurecia.com'],
+        recipients: selectedRecipients,
         vencidos: vencidosCount,
         vencendo: vencendoCount,
         timestamp: new Date().toLocaleTimeString('pt-BR')
@@ -71,7 +79,7 @@ export default function PecasCoelho() {
     } catch (e) {
       // Fallback local se a API estiver em modo offline
       setEmailStatus({
-        recipients: ['caio.cabral@faurecia.com', 'anna.julia@faurecia.com', 'admin@faurecia.com'],
+        recipients: selectedRecipients,
         vencidos: vencidosCount,
         vencendo: vencendoCount,
         timestamp: new Date().toLocaleTimeString('pt-BR')
@@ -394,6 +402,15 @@ export default function PecasCoelho() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE SELEÇÃO DE DESTINATÁRIOS COM LUPA DE PESQUISA 🔍 */}
+      <EmailRecipientSelectorModal
+        isOpen={showRecipientModal}
+        onClose={() => setShowRecipientModal(false)}
+        onConfirmSend={executeSendEmail}
+        expiringCount={vencendoCount}
+        expiredCount={vencidosCount}
+      />
 
     </div>
   );
