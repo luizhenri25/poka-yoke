@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AnimatedCharacterCanvas from '../components/AnimatedCharacterCanvas';
 import { Lock, UserCheck, ShieldCheck, Wrench, User, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function Login() {
@@ -42,7 +43,7 @@ export default function Login() {
       padding: '1.5rem',
       gap: '2rem'
     }}>
-      {/* BONECO 3D MAIOR SEM FUNDO (BONECO2.MP4) NA LATERAL DA TELA DE LOGIN */}
+      {/* BONECO ANIMADO CANVAS 2D APENAS NA LATERAL TELA DE LOGIN */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -50,47 +51,7 @@ export default function Login() {
         gap: '1rem',
         position: 'relative'
       }}>
-        {/* Balão de Fala do Assistente */}
-        <div style={{
-          backgroundColor: 'white',
-          border: '2px solid var(--color-primary)',
-          borderRadius: '16px',
-          padding: '0.85rem 1.15rem',
-          boxShadow: 'var(--shadow-md)',
-          fontSize: '0.85rem',
-          fontWeight: 800,
-          color: 'var(--color-primary-dark)',
-          textAlign: 'center',
-          maxWidth: '220px',
-          lineHeight: '1.4',
-          borderBottomLeftRadius: '4px'
-        }}>
-          Olá! 👋 Seja bem-vindo ao POKA-YOKE. Faça seu login ao lado!
-        </div>
-
-        {/* Vídeo do Boneco Correto (boneco-correto.mp4) */}
-        <div style={{
-          width: '260px',
-          height: '390px',
-          display: 'flex',
-          justify: 'center',
-          alignItems: 'center',
-          position: 'relative'
-        }}>
-          <video
-            src="/boneco-correto.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0px 10px 22px rgba(0, 0, 0, 0.18))'
-            }}
-          />
-        </div>
+        <AnimatedCharacterCanvas height={320} width={240} defaultAnim="waving" />
       </div>
 
       <div style={{
