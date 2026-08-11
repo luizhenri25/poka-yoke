@@ -5,12 +5,22 @@ import AnimatedCharacterCanvas from '../components/AnimatedCharacterCanvas';
 import { Lock, UserCheck, ShieldCheck, Wrench, User, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function Login() {
-  const { login, DEFAULT_USERS } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [characterAnim, setCharacterAnim] = useState('waving');
+  const [characterMsg, setCharacterMsg] = useState('👋 Olá! Seja bem-vindo ao POKA-YOKE. Faça seu login ao lado!');
+
+  const handleSuccessLoginFlow = () => {
+    setCharacterAnim('smiling');
+    setCharacterMsg('😊 Login efetuado com sucesso! Redirecionando...');
+    setTimeout(() => {
+      navigate('/');
+    }, 1200);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,7 +28,7 @@ export default function Login() {
 
     const res = login(identifier, password);
     if (res.success) {
-      navigate('/');
+      handleSuccessLoginFlow();
     } else {
       setErrorMessage(res.error);
     }
@@ -29,7 +39,7 @@ export default function Login() {
     setPassword(pwd);
     const res = login(email, pwd);
     if (res.success) {
-      navigate('/');
+      handleSuccessLoginFlow();
     }
   };
 
@@ -51,7 +61,12 @@ export default function Login() {
         gap: '1rem',
         position: 'relative'
       }}>
-        <AnimatedCharacterCanvas height={320} width={240} defaultAnim="waving" />
+        <AnimatedCharacterCanvas 
+          height={320} 
+          width={240} 
+          currentAnim={characterAnim} 
+          customMessage={characterMsg} 
+        />
       </div>
 
       <div style={{

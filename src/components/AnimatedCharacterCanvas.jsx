@@ -6,12 +6,18 @@ const ANIMATIONS = {
   smiling: { asset: '/assets/character/sprites/smiling.png', frameCount: 6, fps: 6 }
 };
 
-export default function AnimatedCharacterCanvas({ height = 240, width = 200, defaultAnim = 'waving' }) {
+export default function AnimatedCharacterCanvas({ height = 240, width = 200, defaultAnim = 'waving', currentAnim = null, customMessage = null }) {
   const canvasRef = useRef(null);
-  const [animState, setAnimState] = useState(defaultAnim);
+  const [animState, setAnimState] = useState(currentAnim || defaultAnim);
   const [isPaused, setIsPaused] = useState(false);
   const [images, setImages] = useState({});
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (currentAnim) {
+      setAnimState(currentAnim);
+    }
+  }, [currentAnim]);
 
   // Precarregar spritesheet PNGs
   useEffect(() => {
@@ -127,7 +133,7 @@ export default function AnimatedCharacterCanvas({ height = 240, width = 200, def
         lineHeight: '1.3',
         borderBottomLeftRadius: '4px'
       }}>
-        {animState === 'waving' ? '👋 Olá! Bem-vindo ao POKA-YOKE System' : '😊 Pronto para validar os processos!'}
+        {customMessage || (animState === 'waving' ? '👋 Olá! Bem-vindo ao POKA-YOKE System' : '😊 Pronto para validar os processos!')}
       </div>
 
       {/* Canvas do Boneco Animado com Transparência */}
