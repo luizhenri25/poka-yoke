@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Settings, Cloud, Grid, GraduationCap, Rabbit } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import Placas from './Placas';
 import LiberacaoProcessos from './LiberacaoProcessos';
 import Treinamento from './Treinamento';
@@ -7,15 +8,21 @@ import ModoBackup from './ModoBackup';
 import PecasCoelho from './PecasCoelho';
 
 export default function JIT() {
+  const { isOperador } = useAuth();
   const [activeTab, setActiveTab] = useState('liberacao');
 
-  const modules = [
+  let modules = [
     { id: 'liberacao', title: 'Liberação de POKA YOKE', subtitle: 'Configuração de processos (BDIA/BTR)', icon: Settings },
     { id: 'backup', title: 'Modo Backup', subtitle: 'Redirecionamento & Standby', icon: Cloud },
     { id: 'placas', title: 'Placas', subtitle: 'Inventário Poka-Yoke', icon: Grid },
     { id: 'treinamento', title: 'Treinamento', subtitle: 'Manuais & Vídeos Técnicos', icon: GraduationCap },
     { id: 'pecas-coelho', title: 'Peças Coelho', subtitle: 'Validação & Controle Mensal', icon: Rabbit }
   ];
+
+  if (isOperador) {
+    // Operadores de Produção: Apenas Liberação de Processos, Modo Backup, Placas e Treinamento
+    modules = modules.filter(m => m.id !== 'pecas-coelho');
+  }
 
   return (
     <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

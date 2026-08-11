@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPokaYokesData, fetchInstrucoesList } from '../utils/csvParser';
+import SignatureCanvasModal from './SignatureCanvasModal';
 import { 
   Activity, 
   CheckCircle2, 
@@ -12,7 +13,8 @@ import {
   ShieldCheck, 
   FileCheck,
   TrendingUp,
-  Search
+  Search,
+  Edit3
 } from 'lucide-react';
 
 export default function DashboardCentral() {
@@ -21,6 +23,10 @@ export default function DashboardCentral() {
   const [loading, setLoading] = useState(true);
   const [selectedLine, setSelectedLine] = useState('TODAS');
   const [searchOperator, setSearchOperator] = useState('');
+  
+  // Estado para Modal de Assinatura com o Dedo
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOp, setSelectedOp] = useState(null);
 
   // Simulação de base de dados de treinamentos com assinaturas digitais
   const [operadores, setOperadores] = useState([
@@ -96,12 +102,38 @@ export default function DashboardCentral() {
   const totalOperadores = filteredOperadores.length || 1;
   const percAssinados = Math.round((assinadosCount / totalOperadores) * 100);
 
+  const handleOpenSignatureModal = (op) => {
+    setSelectedOp(op);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveSignature = (signatureDataUrl) => {
+    if (!selectedOp) return;
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+    setOperadores(prev => prev.map(op => {
+      if (op.id === selectedOp.id) {
+        return { 
+          ...op, 
+          assinado: true, 
+          data: dataHoje, 
+          assinaturaImg: signatureDataUrl 
+        };
+      }
+      return op;
+    }));
+  };
+
   const toggleAssinatura = (id) => {
     setOperadores(prev => prev.map(op => {
       if (op.id === id) {
         const nextState = !op.assinado;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        return { ...op, assinado: nextState, data: nextState ? dataHoje : null };
+        return { 
+          ...op, 
+          assinado: nextState, 
+          data: nextState ? dataHoje : null,
+          assinaturaImg: nextState ? op.assinaturaImg : null
+        };
       }
       return op;
     }));
@@ -496,10 +528,17 @@ export default function DashboardCentral() {
                     </td>
                     <td style={{ padding: '0.85rem 1rem' }}>
                       {op.assinado ? (
-                        <span className="badge-status" style={{ backgroundColor: '#ECFDF5', color: '#10B981', border: '1px solid #A7F3D0' }}>
-                          <CheckCircle2 size={13} />
-                          <span>Assinado em {op.data}</span>
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          <span className="badge-status" style={{ backgroundColor: '#ECFDF5', color: '#10B981', border: '1px solid #A7F3D0' }}>
+                            <CheckCircle2 size={13} />
+                            <span>Assinado em {op.data}</span>
+                          </span>
+                          {op.assinaturaImg && (
+                            <div style={{ backgroundColor: 'white', border: '1px solid #CBD5E1', padding: '0.15rem 0.4rem', borderRadius: '4px', maxWidth: '100px' }}>
+                              <img src={op.assinaturaImg} alt="Assinatura com o dedo" style={{ width: '100%', height: '22px', objectFit: 'contain' }} />
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span className="badge-status" style={{ backgroundColor: '#FFFBEB', color: '#F59E0B', border: '1px solid #FDE68A' }}>
                           <Clock size={13} />
@@ -508,13 +547,25 @@ export default function DashboardCentral() {
                       )}
                     </td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
-                      <button
-                        className={`btn ${op.assinado ? 'btn-outline' : 'btn-primary'}`}
-                        style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-                        onClick={() => toggleAssinatura(op.id)}
-                      >
-                        <span>{op.assinado ? 'Desfazer' : 'Assinar Digitalmente'}</span>
-                      </button>
+                      {op.assinado ? (
+                        <button
+                          className="btn btn-outline"
+                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                          onClick={() => toggleAssinatura(op.id)}
+                        >
+                          <span>Desfazer</span>
+                        </button>
+                      ) : (
+                        <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
+                          <button
+                            className="btn btn-primary"
+                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', backgroundColor: '#0A1B9F' }}
+                            onClick={() => handleOpenSignatureModal(op)}
+                          >
+                            <Edit3 size={14} /> <span>Assinar com o Dedo</span>
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -524,6 +575,15 @@ export default function DashboardCentral() {
         </div>
 
       </div>
+
+      {/* Modal Interativo de Assinatura com o Dedo (Touch Pad) */}
+      <SignatureCanvasModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveSignature}
+        operatorName={selectedOp?.nome}
+        postoName={selectedOp?.posto}
+      />
 
     </div>
   );

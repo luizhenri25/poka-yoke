@@ -21,7 +21,7 @@ export default function Layout() {
     }
   }, [isDarkMode]);
 
-  const navItems = [
+  let navItems = [
     { path: '/', label: '', icon: Home },
     { path: '/busca', label: 'Busca Global', icon: Search },
     { path: '/jit', label: 'Módulo JIT', icon: AudioLines },
@@ -31,7 +31,14 @@ export default function Layout() {
     { path: '/visualizador-3d', label: 'Visualizador 3D', icon: Box },
   ];
 
-  if (isAdmin) {
+  if (isOperador) {
+    // Sistema de Produção para Operadores: Apenas Módulo JIT, Busca e Treinamentos
+    navItems = [
+      { path: '/', label: 'Assinaturas & Treinos', icon: Home },
+      { path: '/jit', label: 'Módulo JIT (Liberação/Backup/Placas/Treinos)', icon: AudioLines },
+      { path: '/busca', label: 'Busca Global', icon: Search },
+    ];
+  } else if (isAdmin) {
     navItems.push({ path: '/gestao-usuarios', label: 'Gestão Usuários', icon: Users });
   }
 
