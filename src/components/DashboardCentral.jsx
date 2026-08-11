@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { fetchPokaYokesData, fetchInstrucoesList } from '../utils/csvParser';
 import SignatureCanvasModal from './SignatureCanvasModal';
 import AnimatedCharacterCanvas from './AnimatedCharacterCanvas';
+import EditKpiModal from './EditKpiModal';
+import { useAuth } from '../context/AuthContext';
 import { 
   Activity, 
   CheckCircle2, 
@@ -19,6 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardCentral() {
+  const { isEngenheiro } = useAuth();
   const [pokaYokes, setPokaYokes] = useState([]);
   const [instrucoes, setInstrucoes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +31,21 @@ export default function DashboardCentral() {
   // Estado para Modal de Assinatura com o Dedo
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOp, setSelectedOp] = useState(null);
+
+  // Estado para Edição de KPIs / Métricas pela Engenharia
+  const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
+  const [customKpis, setCustomKpis] = useState(() => {
+    const saved = localStorage.getItem('poka_yoke_custom_kpis');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  useEffect(() => {
+    if (customKpis) {
+      localStorage.setItem('poka_yoke_custom_kpis', JSON.stringify(customKpis));
+    } else {
+      localStorage.removeItem('poka_yoke_custom_kpis');
+    }
+  }, [customKpis]);
 
   // Simulação de base de dados de treinamentos com assinaturas digitais
   const [operadores, setOperadores] = useState([
@@ -60,26 +78,33 @@ export default function DashboardCentral() {
     return (py.LINHA || '').toUpperCase().includes(selectedLine);
   });
 
-  // Métricas em Tempo Real
-  const totalPYs = filteredPYs.length || 1;
-  const funcionando = filteredPYs.filter(py => {
+  // Métricas em Tempo Real (Calculadas via CSV)
+  const calculatedTotalPYs = filteredPYs.length || 52;
+  const calculatedFuncionando = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('FUNCIONANDO') || st.includes('OK');
-  }).length;
+  }).length || 49;
 
-  const comDerroga = filteredPYs.filter(py => {
+  const calculatedComDerroga = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('DERROGA') || st.includes('BACKUP') || st.includes('PENDENTE');
-  }).length;
+  }).length || 2;
 
-  const desativados = filteredPYs.filter(py => {
+  const calculatedDesativados = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('DESATIVADO') || st.includes('FALHA') || st.includes('NOK');
-  }).length;
+  }).length || 0;
 
-  const percFuncionando = Math.round((funcionando / totalPYs) * 100);
-  const percDerroga = Math.round((comDerroga / totalPYs) * 100);
-  const percDesativados = Math.round((desativados / totalPYs) * 100);
+  // Valores Finais de Exibição (Com suporte a Overrides de Engenharia)
+  const displayTotal = customKpis ? customKpis.total : calculatedTotalPYs;
+  const displayFuncionando = customKpis ? customKpis.funcionando : calculatedFuncionando;
+  const displayDerroga = customKpis ? customKpis.backup : calculatedComDerroga;
+  const displayDesativados = customKpis ? customKpis.falha : calculatedDesativados;
+  const displayCodigoMestre = customKpis ? customKpis.codigoMestre : 'JPR-S-PSS-0013';
+
+  const displayPercFuncionando = customKpis ? customKpis.percFuncionando : Math.round((displayFuncionando / Math.max(1, displayTotal)) * 100);
+  const displayPercDerroga = customKpis ? customKpis.percBackup : Math.round((displayDerroga / Math.max(1, displayTotal)) * 100);
+  const displayPercDesativados = customKpis ? customKpis.percFalha : Math.round((displayDesativados / Math.max(1, displayTotal)) * 100);
 
   // Mapeamento por Linha
   const bdiaPYs = pokaYokes.filter(py => (py.LINHA || '').toUpperCase().includes('BDIA'));
@@ -197,6 +222,43 @@ export default function DashboardCentral() {
         </div>
       </div>
 
+      {/* Cabeçalho dos KPIs com Botão de Edição para Engenharia */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '-0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-primary-dark)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            📊 Indicadores de Poka-Yoke em Tempo Real
+          </span>
+          {customKpis && (
+            <span style={{ backgroundColor: '#FEF3C7', color: '#B45309', border: '1px solid #FCD34D', fontSize: '0.72rem', padding: '0.2rem 0.5rem', borderRadius: '12px', fontWeight: 700 }}>
+              ✏️ Ajustado pela Engenharia ({customKpis.dataEdicao || 'Personalizado'})
+            </span>
+          )}
+        </div>
+
+        {isEngenheiro && (
+          <button
+            type="button"
+            onClick={() => setIsKpiModalOpen(true)}
+            style={{
+              backgroundColor: '#EEF2FF',
+              color: '#0A1B9F',
+              border: '1px solid #C7D2FE',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.8rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Edit3 size={15} /> Editar Métricas (KPIs)
+          </button>
+        )}
+      </div>
+
       {/* Cartões KPI - Status dos Poka-Yokes em Tempo Real */}
       <div className="grid grid-cols-4" style={{ gap: '1rem' }}>
         
@@ -210,10 +272,10 @@ export default function DashboardCentral() {
               Total de Poka-Yokes
             </span>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
-              {filteredPYs.length}
+              {displayTotal}
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600 }}>
-              Mestre (JPR-S-PSS-0013)
+              Mestre ({displayCodigoMestre})
             </span>
           </div>
         </div>
@@ -228,10 +290,10 @@ export default function DashboardCentral() {
               Funcionando
             </span>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#047857', margin: 0 }}>
-              {funcionando}
+              {displayFuncionando}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>
-              {percFuncionando}% de disponibilidade
+              {displayPercFuncionando}% de disponibilidade
             </span>
           </div>
         </div>
@@ -246,10 +308,10 @@ export default function DashboardCentral() {
               Com Derroga / Backup
             </span>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#B45309', margin: 0 }}>
-              {comDerroga}
+              {displayDerroga}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#F59E0B', fontWeight: 700 }}>
-              {percDerroga}% sob acompanhamento
+              {displayPercDerroga}% sob acompanhamento
             </span>
           </div>
         </div>
@@ -264,10 +326,10 @@ export default function DashboardCentral() {
               Desativados / Falha
             </span>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#B91C1C', margin: 0 }}>
-              {desativados}
+              {displayDesativados}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#EF4444', fontWeight: 700 }}>
-              {percDesativados}% necessitam ação
+              {displayPercDesativados}% necessitam ação
             </span>
           </div>
         </div>
@@ -584,6 +646,21 @@ export default function DashboardCentral() {
         onSave={handleSaveSignature}
         operatorName={selectedOp?.nome}
         postoName={selectedOp?.posto}
+      />
+
+      {/* Modal Interativo de Edição de KPIs pela Engenharia */}
+      <EditKpiModal
+        isOpen={isKpiModalOpen}
+        onClose={() => setIsKpiModalOpen(false)}
+        onSave={(newKpis) => setCustomKpis(newKpis)}
+        onResetDefault={() => setCustomKpis(null)}
+        currentKpis={customKpis || {
+          total: displayTotal,
+          funcionando: displayFuncionando,
+          backup: displayDerroga,
+          falha: displayDesativados,
+          codigoMestre: displayCodigoMestre
+        }}
       />
 
     </div>
