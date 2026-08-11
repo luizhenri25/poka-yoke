@@ -44,39 +44,64 @@ export default function Login() {
   };
 
   return (
-    <div style={{
+    <div className="login-container" style={{
       minHeight: '100vh',
       display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: 'var(--color-bg-main)',
-      padding: '1.5rem',
-      gap: '2rem'
+      padding: '1.25rem',
+      gap: '2rem',
+      boxSizing: 'border-box'
     }}>
-      {/* BONECO ANIMADO CANVAS 2D APENAS NA LATERAL TELA DE LOGIN */}
-      <div style={{
+      
+      {/* CSS RESPONSIVO PARA CELULAR (SMARTPHONES) */}
+      <style>{`
+        @media (max-width: 768px) {
+          .login-container {
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            padding: 1rem 0.75rem !important;
+            gap: 1rem !important;
+          }
+          .login-character-box {
+            transform: scale(0.85);
+            margin-bottom: -1rem;
+          }
+          .login-card {
+            padding: 1.5rem 1.25rem !important;
+            max-width: 100% !important;
+          }
+        }
+      `}</style>
+
+      {/* BONECO ANIMADO CANVAS 2D RESPONSIVO */}
+      <div className="login-character-box" style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '1rem',
         position: 'relative'
       }}>
         <AnimatedCharacterCanvas 
-          height={320} 
-          width={240} 
+          height={280} 
+          width={210} 
           currentAnim={characterAnim} 
           customMessage={characterMsg} 
         />
       </div>
 
-      <div style={{
+      {/* CARD DE LOGIN */}
+      <div className="login-card" style={{
         width: '100%',
         maxWidth: '440px',
         backgroundColor: 'white',
         borderRadius: 'var(--radius-xl)',
-        padding: '2.5rem',
+        padding: '2.25rem',
         boxShadow: 'var(--shadow-lg)',
-        border: '1px solid var(--color-border)'
+        border: '1px solid var(--color-border)',
+        boxSizing: 'border-box'
       }}>
         
         {/* Logo & Cabeçalho */}
