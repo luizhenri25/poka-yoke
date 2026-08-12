@@ -127,7 +127,7 @@ export default function Placas() {
             <button 
               key={posto || idx}
               className={`posto-item ${selectedPosto === posto ? 'active' : ''}`}
-              onClick={() => { setSelectedPosto(posto); setPlacaPronta(false); }}
+              onClick={() => setSelectedPosto(posto)}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className={`status-dot ${selectedPosto === posto ? 'green' : 'gray'}`}></div>
