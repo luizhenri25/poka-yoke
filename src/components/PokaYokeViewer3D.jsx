@@ -99,7 +99,7 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
     });
 
     if (modelType === 'BANCOS_P13C') {
-      // ESTRUTURA REAL 3D DOS BANCOS P13C (CARREGADA DO ARQUIVO NATIVO BANCOS_P13C.glb VIA GLTFLOADER)
+      // APENAS O ARQUIVO ORIGINAL 3D DO USUÁRIO (BANCOS_P13C.glb) SEM DESENHOS ADICIONAIS
       setIsLoadingModel(true);
 
       const loader = new GLTFLoader();
@@ -108,20 +108,26 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
         (gltf) => {
           const model = gltf.scene;
           
-          // Calcular a caixa envolvente para centralizar e ajustar a escala perfeitamente
+          // Corrigir orientação do arquivo CAD Siemens (Z-Up para Y-Up em WebGL para o banco ficar reto em pé)
+          model.rotation.x = -Math.PI / 2;
+          model.updateMatrixWorld(true);
+
+          // Recalcular a caixa delimitadora com o modelo de pé
           const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
           
           const maxDimension = Math.max(size.x, size.y, size.z);
-          const targetScale = 3.8 / (maxDimension || 1);
+          const targetScale = 3.6 / (maxDimension || 1);
           
           model.scale.set(targetScale, targetScale, targetScale);
+          
+          // Centralizar perfeitamente no piso industrial
           model.position.x = -center.x * targetScale;
-          model.position.y = -center.y * targetScale;
+          model.position.y = -box.min.y * targetScale - 0.9;
           model.position.z = -center.z * targetScale;
 
-          // Habilitar renderização de materiais duplos e sombras
+          // Habilitar renderização de materiais originais
           model.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
@@ -144,35 +150,8 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
         (error) => {
           console.error("Erro ao carregar o arquivo 3D BANCOS_P13C.glb:", error);
           setIsLoadingModel(false);
-
-          // Fallback de contingência caso haja erro no buffer da rede
-          const fallbackBaseGeo = new THREE.BoxGeometry(3.6, 0.25, 2.8);
-          const fallbackBaseMesh = new THREE.Mesh(fallbackBaseGeo, metalMaterial);
-          mainGroup.add(fallbackBaseMesh);
         }
       );
-
-      // Adicionar Sensores Poka-Yoke Néon de Inspeção sobre o Modelo CAD 3D
-      const sensorGeo = new THREE.BoxGeometry(0.35, 0.35, 0.45);
-      const sensorMesh = new THREE.Mesh(sensorGeo, highlightMaterial);
-      sensorMesh.position.set(-0.1, 0.4, -0.45);
-      mainGroup.add(sensorMesh);
-      sensorMeshRef.current = sensorMesh;
-
-      // Fecho de Cinto P13C (Red Rabbit / Peça Coelho)
-      const buckleBodyGeo = new THREE.BoxGeometry(0.18, 0.55, 0.22);
-      const buckleMesh = new THREE.Mesh(buckleBodyGeo, rabbitMaterial);
-      buckleMesh.position.set(-0.4, -0.2, 0.15);
-      mainGroup.add(buckleMesh);
-      rabbitMeshRef.current = buckleMesh;
-
-      // Feixe Laser Néon Azul de Varredura Poka-Yoke
-      const laserGeo = new THREE.CylinderGeometry(0.015, 0.015, 2.5);
-      const laserMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8, transparent: true, opacity: 0.85 });
-      const laserMesh = new THREE.Mesh(laserGeo, laserMat);
-      laserMesh.rotation.z = Math.PI / 2;
-      laserMesh.position.set(-0.7, 0.4, -0.45);
-      mainGroup.add(laserMesh);
 
     } else if (modelType === 'POSTO3') {
       // ESTRUTURA DE BANCO BDIA + SENSOR POKA YOKE DE INVERSÃO
