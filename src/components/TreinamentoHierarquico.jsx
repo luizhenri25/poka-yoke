@@ -11,9 +11,12 @@ import {
   ShieldCheck, 
   Award,
   Calendar,
-  Search
+  Search,
+  Lock,
+  X
 } from 'lucide-react';
 import SignatureCanvasModal from './SignatureCanvasModal';
+import { useAuth } from '../context/AuthContext';
 
 // Base de Dados Padrão de Postos e Operadores da Faurecia
 const DEFAULT_POSTS_DATA = {
@@ -77,9 +80,11 @@ const DEFAULT_POSTS_DATA = {
 };
 
 export default function TreinamentoHierarquico() {
+  const { currentUser, isAdmin, isEngenheiro } = useAuth();
   const [categoria, setCategoria] = useState(null); // 'MODO BACKUP' ou 'LIBERAÇÃO DE POKA-YOKE'
   const [linha, setLinha] = useState(null); // 'BDIA' ou 'BTR'
   const [searchTerm, setSearchTerm] = useState('');
+  const [identityError, setIdentityError] = useState(null);
 
   // Carregar estado de assinaturas salvas localmente
   const [postData, setPostData] = useState(() => {
@@ -96,8 +101,36 @@ export default function TreinamentoHierarquico() {
     localStorage.setItem('poka_yoke_treinamentos_hierarquicos', JSON.stringify(postData));
   }, [postData]);
 
+  // Função de Validação Estrita de Identidade Digital
+  const canOperatorSign = (opObj) => {
+    if (!currentUser) return false;
+    // Engenheiros e Admins possuem permissão de supervisão no posto
+    if (isAdmin || isEngenheiro) return true;
+
+    // Checar correspondência de Matrícula ou Nome
+    const curMatricula = (currentUser.matricula || '').toLowerCase().trim();
+    const opMatricula = (opObj.matricula || '').toLowerCase().trim();
+    const curName = (currentUser.name || '').toLowerCase().trim();
+    const opName = (opObj.nome || '').toLowerCase().trim();
+
+    return (curMatricula && curMatricula === opMatricula) || 
+           (curName && (curName.includes(opName) || opName.includes(curName)));
+  };
+
   // Abrir Modal de Assinatura ao clicar no operador
   const handleOpenSignature = (postoObj, opObj) => {
+    setIdentityError(null);
+
+    if (!canOperatorSign(opObj)) {
+      setIdentityError({
+        targetOp: opObj.nome,
+        targetMatricula: opObj.matricula,
+        currentName: currentUser?.name || 'Não Identificado',
+        currentMatricula: currentUser?.matricula || currentUser?.email || 'Desconhecido'
+      });
+      return;
+    }
+
     setSelectedPostoName(postoObj.posto);
     setSelectedOp(opObj);
     setIsModalOpen(true);
@@ -525,121 +558,143 @@ export default function TreinamentoHierarquico() {
 
                   {/* Lista de Operadores do Posto */}
                   <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                    {opsFiltrados.map(op => (
-                      <div 
-                        key={op.id}
-                        style={{
-                          display: 'flex',
-                          justify: 'space-between',
-                          alignItems: 'center',
-                          padding: '0.85rem 1rem',
-                          backgroundColor: op.assinado ? '#F0FDF4' : '#FFFBEB',
-                          border: `1px solid ${op.assinado ? '#A7F3D0' : '#FDE68A'}`,
-                          borderRadius: 'var(--radius-md)',
-                          flexWrap: 'wrap',
-                          gap: '0.75rem'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            backgroundColor: op.assinado ? '#10B981' : '#F59E0B',
-                            color: 'white',
+                    {opsFiltrados.map(op => {
+                      const isAllowedToSign = canOperatorSign(op);
+
+                      return (
+                        <div 
+                          key={op.id}
+                          style={{
                             display: 'flex',
+                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 800,
-                            fontSize: '0.9rem'
-                          }}>
-                            {op.nome.charAt(0)}
-                          </div>
-                          <div>
-                            {/* NOME DO OPERADOR CLICÁVEL */}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenSignature(postoObj, op)}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                padding: 0,
-                                fontSize: '1rem',
-                                fontWeight: 800,
-                                color: 'var(--color-primary-dark)',
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                                textDecoration: 'underline'
-                              }}
-                            >
-                              👤 {op.nome} ({op.matricula})
-                            </button>
-                            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '0.15rem' }}>
-                              Status: {op.assinado ? (
-                                <span style={{ color: '#047857', fontWeight: 800 }}>
-                                  ✅ TREINADO E ASSINADO (🕒 {op.dataHora})
-                                </span>
-                              ) : (
-                                <span style={{ color: '#B45309', fontWeight: 700 }}>
-                                  ⏳ Assinatura Pendente — Clique no nome para assinar
-                                </span>
-                              )}
+                            padding: '0.85rem 1rem',
+                            backgroundColor: op.assinado ? '#F0FDF4' : (isAllowedToSign ? '#FFFBEB' : '#F8FAFC'),
+                            border: `1px solid ${op.assinado ? '#A7F3D0' : (isAllowedToSign ? '#FDE68A' : '#E2E8F0')}`,
+                            borderRadius: 'var(--radius-md)',
+                            flexWrap: 'wrap',
+                            gap: '0.75rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                            <div style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              backgroundColor: op.assinado ? '#10B981' : (isAllowedToSign ? '#F59E0B' : '#94A3B8'),
+                              color: 'white',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 800,
+                              fontSize: '0.9rem'
+                            }}>
+                              {op.nome.charAt(0)}
+                            </div>
+                            <div>
+                              {/* NOME DO OPERADOR CLICÁVEL */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenSignature(postoObj, op)}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    padding: 0,
+                                    fontSize: '1rem',
+                                    fontWeight: 800,
+                                    color: 'var(--color-primary-dark)',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    textDecoration: 'underline'
+                                  }}
+                                >
+                                  👤 {op.nome} ({op.matricula})
+                                </button>
+
+                                {isAllowedToSign && !op.assinado && (
+                                  <span style={{ backgroundColor: '#DBEAFE', color: '#1E40AF', padding: '0.15rem 0.5rem', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 800 }}>
+                                    👤 Você (Sua Conta Logada)
+                                  </span>
+                                )}
+
+                                {!isAllowedToSign && !op.assinado && (
+                                  <span style={{ backgroundColor: '#F1F5F9', color: '#64748B', padding: '0.15rem 0.5rem', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                                    <Lock size={11} /> Exige Login do Próprio Operador
+                                  </span>
+                                )}
+                              </div>
+
+                              <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '0.15rem' }}>
+                                Status: {op.assinado ? (
+                                  <span style={{ color: '#047857', fontWeight: 800 }}>
+                                    ✅ TREINADO E ASSINADO (🕒 {op.dataHora})
+                                  </span>
+                                ) : (
+                                  <span style={{ color: isAllowedToSign ? '#B45309' : '#64748B', fontWeight: 700 }}>
+                                    {isAllowedToSign ? '✍️ Clique para assinar o seu treinamento' : '🔒 Restrito: Apenas este operador pode assinar seu próprio treino'}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Botão de Ação do Operador */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          {op.assinado ? (
-                            <>
-                              {op.assinaturaImg && (
-                                <div style={{ backgroundColor: 'white', border: '1px solid #CBD5E1', padding: '0.15rem 0.4rem', borderRadius: '4px', maxWidth: '90px' }}>
-                                  <img src={op.assinaturaImg} alt="Assinatura" style={{ width: '100%', height: '22px', objectFit: 'contain' }} />
-                                </div>
-                              )}
+                          {/* Botão de Ação do Operador */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            {op.assinado ? (
+                              <>
+                                {op.assinaturaImg && (
+                                  <div style={{ backgroundColor: 'white', border: '1px solid #CBD5E1', padding: '0.15rem 0.4rem', borderRadius: '4px', maxWidth: '90px' }}>
+                                    <img src={op.assinaturaImg} alt="Assinatura" style={{ width: '100%', height: '22px', objectFit: 'contain' }} />
+                                  </div>
+                                )}
+                                {(isAdmin || isEngenheiro || isAllowedToSign) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetSignature(linha, postoObj.posto, op.id)}
+                                    style={{
+                                      backgroundColor: '#F1F5F9',
+                                      border: '1px solid #CBD5E1',
+                                      color: '#475569',
+                                      padding: '0.4rem 0.65rem',
+                                      borderRadius: 'var(--radius-md)',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    Desfazer
+                                  </button>
+                                )}
+                              </>
+                            ) : (
                               <button
                                 type="button"
-                                onClick={() => handleResetSignature(linha, postoObj.posto, op.id)}
+                                onClick={() => handleOpenSignature(postoObj, op)}
                                 style={{
-                                  backgroundColor: '#F1F5F9',
-                                  border: '1px solid #CBD5E1',
-                                  color: '#475569',
-                                  padding: '0.4rem 0.65rem',
+                                  backgroundColor: isAllowedToSign ? '#0A1B9F' : '#94A3B8',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '0.5rem 1rem',
                                   borderRadius: 'var(--radius-md)',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 700,
-                                  cursor: 'pointer'
+                                  fontSize: '0.8rem',
+                                  fontWeight: 800,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  boxShadow: 'var(--shadow-sm)'
                                 }}
                               >
-                                Desfazer
+                                {isAllowedToSign ? <Edit3 size={15} /> : <Lock size={15} />}
+                                {isAllowedToSign ? 'Assinar com Dedo / Mouse' : 'Assinar (Requer Login)'}
                               </button>
-                            </>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleOpenSignature(postoObj, op)}
-                              style={{
-                                backgroundColor: '#0A1B9F',
-                                color: 'white',
-                                border: 'none',
-                                padding: '0.5rem 1rem',
-                                borderRadius: 'var(--radius-md)',
-                                fontSize: '0.8rem',
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.4rem',
-                                boxShadow: 'var(--shadow-sm)'
-                              }}
-                            >
-                              <Edit3 size={15} /> Assinar com Dedo / Mouse
-                            </button>
-                          )}
-                        </div>
+                            )}
+                          </div>
 
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
 
                 </div>
@@ -647,6 +702,80 @@ export default function TreinamentoHierarquico() {
             })}
           </div>
 
+        </div>
+      )}
+
+      {/* Modal de Alerta de Segurança (Tentativa de Assinatura por Terceiros) */}
+      {identityError && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justify: 'center',
+          zIndex: 9999,
+          padding: '1rem',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: 'var(--radius-xl)',
+            width: '100%',
+            maxWidth: '520px',
+            boxShadow: 'var(--shadow-xl)',
+            border: '2px solid #EF4444',
+            overflow: 'hidden'
+          }}>
+            <div style={{ backgroundColor: '#EF4444', color: 'white', padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Lock size={24} />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 900, margin: 0 }}>
+                  Bloqueio de Segurança Digital
+                </h3>
+              </div>
+              <button onClick={() => setIdentityError(null)} style={{ backgroundColor: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+                <X size={22} />
+              </button>
+            </div>
+
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FCA5A5', padding: '1rem', borderRadius: 'var(--radius-md)', color: '#991B1B', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                🔒 <strong>Assinatura Restrita ao Próprio Operador:</strong>
+                <p style={{ marginTop: '0.5rem', margin: 0 }}>
+                  Você está autenticado no momento como <strong>{identityError.currentName} ({identityError.currentMatricula})</strong>.
+                </p>
+                <p style={{ marginTop: '0.5rem', margin: 0 }}>
+                  Apenas o operador <strong>{identityError.targetOp} ({identityError.targetMatricula})</strong> possui permissão jurídica e de processo para assinar o seu próprio treinamento.
+                </p>
+              </div>
+
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                💡 <em>Dica: Para assinar este treinamento, altere o usuário autenticado na tela de login ou solicite a supervisão de um Engenheiro de Processos.</em>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIdentityError(null)}
+                style={{
+                  backgroundColor: '#0A1B9F',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.75rem',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  width: '100%'
+                }}
+              >
+                Compreendido
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
