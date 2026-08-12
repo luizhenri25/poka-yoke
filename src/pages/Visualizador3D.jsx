@@ -198,17 +198,17 @@ export default function Visualizador3D() {
                 </p>
               </div>
 
-              {/* Botão de Download do Arquivo 3D CAD Original (BANCOS_P13C.jt) */}
-              <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '0.85rem' }}>
+              {/* Botões de Download dos Arquivos 3D CAD Originais (BANCOS_P13C.glb & BANCOS_P13C.jt) */}
+              <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <a
-                  href="/BANCOS_P13C.jt"
-                  download="BANCOS_P13C.jt"
+                  href="/BANCOS_P13C.glb"
+                  download="BANCOS_P13C.glb"
                   className="btn btn-primary"
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
                     borderRadius: 'var(--radius-md)',
-                    backgroundColor: '#0A1B9F',
+                    backgroundColor: '#047857',
                     color: 'white',
                     fontWeight: 800,
                     fontSize: '0.85rem',
@@ -220,7 +220,29 @@ export default function Visualizador3D() {
                     boxShadow: 'var(--shadow-sm)'
                   }}
                 >
-                  <Download size={18} /> Baixar Arquivo 3D CAD (BANCOS_P13C.jt - 37 MB)
+                  <Download size={18} /> Baixar Modelo 3D Nativo (BANCOS_P13C.glb - 107 MB)
+                </a>
+
+                <a
+                  href="/BANCOS_P13C.jt"
+                  download="BANCOS_P13C.jt"
+                  className="btn btn-outline"
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid #CBD5E1',
+                    color: '#0A1B9F',
+                    fontWeight: 800,
+                    fontSize: '0.825rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <Download size={16} /> Baixar CAD Siemens (BANCOS_P13C.jt - 37 MB)
                 </a>
               </div>
 

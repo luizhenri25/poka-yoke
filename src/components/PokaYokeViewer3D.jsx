@@ -1,13 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { RotateCw, ZoomIn, Eye, Sparkles, Rabbit, Target, RefreshCw } from 'lucide-react';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { RotateCw, ZoomIn, Eye, Sparkles, Rabbit, Target, RefreshCw, Loader2 } from 'lucide-react';
 
 export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor = true, showRabbit = false }) {
   const mountRef = useRef(null);
   const [autoRotate, setAutoRotate] = useState(false);
   const [isHighlightSensor, setIsHighlightSensor] = useState(highlightSensor);
   const [isShowRabbit, setIsShowRabbit] = useState(showRabbit);
+
+  // Estado de carregamento de arquivos 3D pesados (.glb)
+  const [isLoadingModel, setIsLoadingModel] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
 
   // References for Three.js objects
   const sceneRef = useRef(null);
@@ -94,132 +99,79 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
     });
 
     if (modelType === 'BANCOS_P13C') {
-      // ESTRUTURA DETALHADA DOS BANCOS P13C (FORVIA FAURECIA - CAD BANCOS_P13C.jt)
-      
-      // Materiais Automotivos Customizados
-      const seatFabricMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x1E293B, 
-        roughness: 0.85,
-        metalness: 0.1
-      });
+      // ESTRUTURA REAL 3D DOS BANCOS P13C (CARREGADA DO ARQUIVO NATIVO BANCOS_P13C.glb VIA GLTFLOADER)
+      setIsLoadingModel(true);
 
-      const frameSteelMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x64748B, 
-        metalness: 0.9,
-        roughness: 0.2
-      });
+      const loader = new GLTFLoader();
+      loader.load(
+        '/BANCOS_P13C.glb',
+        (gltf) => {
+          const model = gltf.scene;
+          
+          // Calcular a caixa envolvente para centralizar e ajustar a escala perfeitamente
+          const box = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          const targetScale = 3.8 / (maxDimension || 1);
+          
+          model.scale.set(targetScale, targetScale, targetScale);
+          model.position.x = -center.x * targetScale;
+          model.position.y = -center.y * targetScale;
+          model.position.z = -center.z * targetScale;
 
-      const leatherMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x0F172A, 
-        roughness: 0.4,
-        metalness: 0.2
-      });
+          // Habilitar renderização de materiais duplos e sombras
+          model.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              if (child.material) {
+                child.material.side = THREE.DoubleSide;
+              }
+            }
+          });
 
-      // Base da plataforma de testes de montagem P13C
-      const baseGeo = new THREE.BoxGeometry(4.2, 0.2, 3.2);
-      const baseMesh = new THREE.Mesh(baseGeo, frameSteelMaterial);
-      baseMesh.position.y = -1.1;
-      mainGroup.add(baseMesh);
+          mainGroup.add(model);
+          setIsLoadingModel(false);
+        },
+        (xhr) => {
+          if (xhr.lengthComputable && xhr.total > 0) {
+            const percent = Math.round((xhr.loaded / xhr.total) * 100);
+            setLoadProgress(percent);
+          }
+        },
+        (error) => {
+          console.error("Erro ao carregar o arquivo 3D BANCOS_P13C.glb:", error);
+          setIsLoadingModel(false);
 
-      // --- 1. BANCO DIANTEIRO P13C (MOTORISTA & PASSAGEIRO) ---
-      // Trilhos de regulagem longitudinal
-      const railGeo = new THREE.BoxGeometry(0.12, 0.15, 2.0);
-      const rail1 = new THREE.Mesh(railGeo, frameSteelMaterial);
-      rail1.position.set(-1.4, -0.9, 0);
-      mainGroup.add(rail1);
+          // Fallback de contingência caso haja erro no buffer da rede
+          const fallbackBaseGeo = new THREE.BoxGeometry(3.6, 0.25, 2.8);
+          const fallbackBaseMesh = new THREE.Mesh(fallbackBaseGeo, metalMaterial);
+          mainGroup.add(fallbackBaseMesh);
+        }
+      );
 
-      const rail2 = rail1.clone();
-      rail2.position.set(-0.6, -0.9, 0);
-      mainGroup.add(rail2);
-
-      // Assento Dianteiro P13C (Almofada principal + abas de apoio lateral)
-      const seatBaseGeo = new THREE.BoxGeometry(1.0, 0.35, 1.3);
-      const seatBaseMesh = new THREE.Mesh(seatBaseGeo, seatFabricMaterial);
-      seatBaseMesh.position.set(-1.0, -0.65, 0.1);
-      mainGroup.add(seatBaseMesh);
-
-      const sideBolsterL = new THREE.BoxGeometry(0.2, 0.45, 1.3);
-      const bolsterL = new THREE.Mesh(sideBolsterL, leatherMaterial);
-      bolsterL.position.set(-1.45, -0.6, 0.1);
-      mainGroup.add(bolsterL);
-
-      const bolsterR = bolsterL.clone();
-      bolsterR.position.set(-0.55, -0.6, 0.1);
-      mainGroup.add(bolsterR);
-
-      // Encosto Dianteiro P13C
-      const backRestGeo = new THREE.BoxGeometry(0.9, 1.6, 0.25);
-      const backRestMesh = new THREE.Mesh(backRestGeo, seatFabricMaterial);
-      backRestMesh.position.set(-1.0, 0.3, -0.45);
-      backRestMesh.rotation.x = -0.15;
-      mainGroup.add(backRestMesh);
-
-      // Hastes e Apoio de Cabeça P13C
-      const rodGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.5);
-      const rod1 = new THREE.Mesh(rodGeo, frameSteelMaterial);
-      rod1.position.set(-1.15, 1.15, -0.58);
-      mainGroup.add(rod1);
-
-      const rod2 = rod1.clone();
-      rod2.position.set(-0.85, 1.15, -0.58);
-      mainGroup.add(rod2);
-
-      const headrestGeo = new THREE.BoxGeometry(0.65, 0.4, 0.22);
-      const headrestMesh = new THREE.Mesh(headrestGeo, leatherMaterial);
-      headrestMesh.position.set(-1.0, 1.35, -0.6);
-      mainGroup.add(headrestMesh);
-
-      // --- 2. BANCO TRASEIRO P13C (BTR - BIPARTIDO 60/40) ---
-      // Assento Traseiro Triplo P13C
-      const rearSeatGeo = new THREE.BoxGeometry(1.8, 0.35, 1.4);
-      const rearSeatMesh = new THREE.Mesh(rearSeatGeo, seatFabricMaterial);
-      rearSeatMesh.position.set(0.9, -0.65, 0.1);
-      mainGroup.add(rearSeatMesh);
-
-      // Encosto Bipartido 60% (Lado Direito)
-      const back60Geo = new THREE.BoxGeometry(1.1, 1.5, 0.25);
-      const back60Mesh = new THREE.Mesh(back60Geo, seatFabricMaterial);
-      back60Mesh.position.set(1.2, 0.25, -0.45);
-      back60Mesh.rotation.x = -0.1;
-      mainGroup.add(back60Mesh);
-
-      // Encosto Bipartido 40% (Lado Esquerdo)
-      const back40Geo = new THREE.BoxGeometry(0.65, 1.5, 0.25);
-      const back40Mesh = new THREE.Mesh(back40Geo, seatFabricMaterial);
-      back40Mesh.position.set(0.3, 0.25, -0.45);
-      back40Mesh.rotation.x = -0.1;
-      mainGroup.add(back40Mesh);
-
-      // Apoios de Cabeça Traseiros P13C
-      const rearHeadrest1 = headrestMesh.clone();
-      rearHeadrest1.position.set(1.2, 1.2, -0.55);
-      mainGroup.add(rearHeadrest1);
-
-      const rearHeadrest2 = headrestMesh.clone();
-      rearHeadrest2.position.set(0.3, 1.2, -0.55);
-      mainGroup.add(rearHeadrest2);
-
-      // --- 3. SENSORES POKA-YOKE & PEÇA COELHO P13C ---
-      // Fecho de Cinto P13C (Red Rabbit)
-      const buckleBodyGeo = new THREE.BoxGeometry(0.18, 0.55, 0.22);
-      const buckleMesh = new THREE.Mesh(buckleBodyGeo, rabbitMaterial);
-      buckleMesh.position.set(-0.4, -0.3, 0.15);
-      mainGroup.add(buckleMesh);
-      rabbitMeshRef.current = buckleMesh;
-
-      // Sensor Poka-Yoke Néon de Presença e Alinhamento P13C
+      // Adicionar Sensores Poka-Yoke Néon de Inspeção sobre o Modelo CAD 3D
       const sensorGeo = new THREE.BoxGeometry(0.35, 0.35, 0.45);
       const sensorMesh = new THREE.Mesh(sensorGeo, highlightMaterial);
-      sensorMesh.position.set(-0.1, 0.2, -0.45);
+      sensorMesh.position.set(-0.1, 0.4, -0.45);
       mainGroup.add(sensorMesh);
       sensorMeshRef.current = sensorMesh;
 
-      // Feixe Laser Poka-Yoke Néon Azul
-      const laserGeo = new THREE.CylinderGeometry(0.015, 0.015, 2.2);
+      // Fecho de Cinto P13C (Red Rabbit / Peça Coelho)
+      const buckleBodyGeo = new THREE.BoxGeometry(0.18, 0.55, 0.22);
+      const buckleMesh = new THREE.Mesh(buckleBodyGeo, rabbitMaterial);
+      buckleMesh.position.set(-0.4, -0.2, 0.15);
+      mainGroup.add(buckleMesh);
+      rabbitMeshRef.current = buckleMesh;
+
+      // Feixe Laser Néon Azul de Varredura Poka-Yoke
+      const laserGeo = new THREE.CylinderGeometry(0.015, 0.015, 2.5);
       const laserMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8, transparent: true, opacity: 0.85 });
       const laserMesh = new THREE.Mesh(laserGeo, laserMat);
       laserMesh.rotation.z = Math.PI / 2;
-      laserMesh.position.set(-0.7, 0.2, -0.45);
+      laserMesh.position.set(-0.7, 0.4, -0.45);
       mainGroup.add(laserMesh);
 
     } else if (modelType === 'POSTO3') {
@@ -404,6 +356,31 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
   return (
     <div style={{ position: 'relative', width: '100%', height: '420px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid #334155' }}>
       
+      {/* Overlay de Carregamento de Arquivos CAD 3D (.glb) */}
+      {isLoadingModel && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.85)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 20,
+          backdropFilter: 'blur(4px)',
+          color: 'white'
+        }}>
+          <Loader2 size={36} color="#60A5FA" className="animate-spin" style={{ marginBottom: '0.75rem' }} />
+          <strong style={{ fontSize: '1rem', color: '#F8FAFC' }}>Carregando Modelo 3D Nativo (BANCOS_P13C.glb)...</strong>
+          <span style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '0.25rem' }}>
+            Processando malhas e geometrias CAD {loadProgress > 0 ? `(${loadProgress}%)` : ''}
+          </span>
+        </div>
+      )}
+
       {/* 3D WebGL Canvas */}
       <div ref={mountRef} style={{ width: '100%', height: '100%', cursor: 'grab' }} />
 
