@@ -12,8 +12,9 @@ import {
   FileText
 } from 'lucide-react';
 import { getPostoLink } from '../data/postoLinksData';
+import { savePostoStatus } from '../utils/statusStorage';
 
-export default function DetailKpiModal({ isOpen, onClose, statusType, pokaYokesList }) {
+export default function DetailKpiModal({ isOpen, onClose, statusType, pokaYokesList, onStatusChange }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
@@ -296,7 +297,37 @@ export default function DetailKpiModal({ isOpen, onClose, statusType, pokaYokesL
 
                         {/* Status e Link do Vídeo mLEAN */}
                         <td style={{ padding: '0.85rem 1rem', verticalAlign: 'top', textAlign: 'center' }}>
-                          {getStatusBadge(status)}
+                          <div>
+                            {getStatusBadge(status)}
+                          </div>
+
+                          {/* Seletor de Alteração de Status do Posto em Tempo Real ⚙️ */}
+                          <div style={{ marginTop: '0.35rem' }}>
+                            <select
+                              value={status.includes('FUNCIONANDO') || status.includes('OK') ? 'FUNCIONANDO' : (status.includes('DERROGA') || status.includes('BACKUP') ? 'DERROGA / BACKUP' : 'DESATIVADO / FALHA')}
+                              onChange={(e) => {
+                                const newSt = e.target.value;
+                                savePostoStatus(posto, pyCode, newSt);
+                                if (onStatusChange) onStatusChange(posto, pyCode, newSt);
+                              }}
+                              style={{
+                                padding: '0.2rem 0.4rem',
+                                borderRadius: '6px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                border: '1px solid #CBD5E1',
+                                backgroundColor: 'white',
+                                color: 'var(--color-primary-dark)',
+                                cursor: 'pointer',
+                                outline: 'none'
+                              }}
+                              title="Clique para alterar a situação operacional deste posto"
+                            >
+                              <option value="FUNCIONANDO">🟢 Marcar Funcionando</option>
+                              <option value="DERROGA / BACKUP">🟡 Marcar Modo Backup</option>
+                              <option value="DESATIVADO / FALHA">🔴 Marcar Desativado</option>
+                            </select>
+                          </div>
 
                           {videoLink && (
                             <a
@@ -304,7 +335,7 @@ export default function DetailKpiModal({ isOpen, onClose, statusType, pokaYokesL
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{
-                                marginTop: '0.5rem',
+                                marginTop: '0.4rem',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '0.3rem',

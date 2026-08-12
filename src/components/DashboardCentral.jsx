@@ -5,6 +5,7 @@ import AnimatedCharacterCanvas from './AnimatedCharacterCanvas';
 import EditKpiModal from './EditKpiModal';
 import DetailKpiModal from './DetailKpiModal';
 import { useAuth } from '../context/AuthContext';
+import { getCustomPostoStatusMap } from '../utils/statusStorage';
 import { 
   Activity, 
   CheckCircle2, 
@@ -29,6 +30,9 @@ export default function DashboardCentral() {
   const [selectedLine, setSelectedLine] = useState('TODAS');
   const [searchOperator, setSearchOperator] = useState('');
   
+  // Estado para Mapeamento Customizado de Status dos Postos
+  const [customStatusMap, setCustomStatusMap] = useState(() => getCustomPostoStatusMap());
+
   // Estado para Modal de Detalhamento Interativo de Poka-Yokes ao clicar nos cards
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [detailModalStatus, setDetailModalStatus] = useState('TODOS');
@@ -77,28 +81,48 @@ export default function DashboardCentral() {
     loadDashboardData();
   }, []);
 
+  // Mapear Poka-Yokes aplicando overrides de status salvos pelo usuário
+  const pokaYokesWithStatus = pokaYokes.map(py => {
+    const posto = py['DISPOSITIVO/POSTO'] || '';
+    const pyCode = py.PY || '';
+    const key = `${posto}_${pyCode}`;
+    if (customStatusMap[key]) {
+      return { ...py, 'STATUS PY': customStatusMap[key] };
+    }
+    return py;
+  });
+
+  // Handler de alteração de status via Modal
+  const handlePostoStatusChange = (posto, pyCode, newStatus) => {
+    const key = `${posto}_${pyCode}`;
+    setCustomStatusMap(prev => ({
+      ...prev,
+      [key]: newStatus
+    }));
+  };
+
   // Filtragem de PYs conforme a linha selecionada
-  const filteredPYs = pokaYokes.filter(py => {
+  const filteredPYs = pokaYokesWithStatus.filter(py => {
     if (selectedLine === 'TODAS') return true;
     return (py.LINHA || '').toUpperCase().includes(selectedLine);
   });
 
-  // Métricas em Tempo Real (Calculadas via CSV)
+  // Métricas em Tempo Real (Calculadas via CSV + Overrides)
   const calculatedTotalPYs = filteredPYs.length || 52;
   const calculatedFuncionando = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('FUNCIONANDO') || st.includes('OK');
-  }).length || 49;
+  }).length;
 
   const calculatedComDerroga = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('DERROGA') || st.includes('BACKUP') || st.includes('PENDENTE');
-  }).length || 2;
+  }).length;
 
   const calculatedDesativados = filteredPYs.filter(py => {
     const st = (py['STATUS PY'] || '').toUpperCase();
     return st.includes('DESATIVADO') || st.includes('FALHA') || st.includes('NOK');
-  }).length || 0;
+  }).length;
 
   // Valores Finais de Exibição (Com suporte a Overrides de Engenharia)
   const displayTotal = customKpis ? customKpis.total : calculatedTotalPYs;
@@ -668,7 +692,8 @@ export default function DashboardCentral() {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         statusType={detailModalStatus}
-        pokaYokesList={pokaYokes}
+        pokaYokesList={pokaYokesWithStatus}
+        onStatusChange={handlePostoStatusChange}
       />
 
       {/* Modal Interativo de Assinatura com o Dedo (Touch Pad) */}
