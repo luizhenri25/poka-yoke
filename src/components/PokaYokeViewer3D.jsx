@@ -93,7 +93,60 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
       roughness: 0.2
     });
 
-    if (modelType === 'POSTO3') {
+    if (modelType === 'BANCOS_P13C') {
+      // ESTRUTURA COMPLETA DOS BANCOS P13C (FORVIA FAURECIA - BANCOS_P13C.jt)
+      // Base da plataforma de montagem
+      const baseGeo = new THREE.BoxGeometry(3.6, 0.25, 2.8);
+      const baseMesh = new THREE.Mesh(baseGeo, metalMaterial);
+      baseMesh.position.y = -1.0;
+      mainGroup.add(baseMesh);
+
+      // Banco Dianteiro P13C - Assento
+      const seatP13CGeo = new THREE.BoxGeometry(1.4, 0.35, 1.4);
+      const seatP13CMesh = new THREE.Mesh(seatP13CGeo, metalMaterial);
+      seatP13CMesh.position.set(-0.9, -0.4, 0.2);
+      mainGroup.add(seatP13CMesh);
+
+      // Encosto Dianteiro P13C
+      const backP13CGeo = new THREE.BoxGeometry(1.3, 1.8, 0.3);
+      const backP13CMesh = new THREE.Mesh(backP13CGeo, metalMaterial);
+      backP13CMesh.position.set(-0.9, 0.6, -0.4);
+      backP13CMesh.rotation.x = -0.15;
+      mainGroup.add(backP13CMesh);
+
+      // Apoio de Cabeça P13C
+      const headrestGeo = new THREE.BoxGeometry(0.7, 0.45, 0.25);
+      const headrestMesh = new THREE.Mesh(headrestGeo, metalMaterial);
+      headrestMesh.position.set(-0.9, 1.7, -0.55);
+      mainGroup.add(headrestMesh);
+
+      // Banco Traseiro P13C (BTR - Bipartido 60/40)
+      const rearSeatGeo = new THREE.BoxGeometry(1.8, 0.35, 1.5);
+      const rearSeatMesh = new THREE.Mesh(rearSeatGeo, metalMaterial);
+      rearSeatMesh.position.set(0.9, -0.4, 0.2);
+      mainGroup.add(rearSeatMesh);
+
+      const rearBackGeo = new THREE.BoxGeometry(1.7, 1.7, 0.3);
+      const rearBackMesh = new THREE.Mesh(rearBackGeo, metalMaterial);
+      rearBackMesh.position.set(0.9, 0.65, -0.4);
+      rearBackMesh.rotation.x = -0.1;
+      mainGroup.add(rearBackMesh);
+
+      // Sensor Poka-Yoke néon de detecção P13C
+      const sensorP13CGeo = new THREE.BoxGeometry(0.3, 0.3, 0.4);
+      const sensorP13CMesh = new THREE.Mesh(sensorP13CGeo, highlightMaterial);
+      sensorP13CMesh.position.set(-0.25, 0.5, -0.4);
+      mainGroup.add(sensorP13CMesh);
+      sensorMeshRef.current = sensorP13CMesh;
+
+      // Fecho de Cinto P13C (Red Rabbit)
+      const buckleGeo = new THREE.BoxGeometry(0.2, 0.6, 0.25);
+      const buckleMesh = new THREE.Mesh(buckleGeo, rabbitMaterial);
+      buckleMesh.position.set(-0.2, -0.1, 0.2);
+      mainGroup.add(buckleMesh);
+      rabbitMeshRef.current = buckleMesh;
+
+    } else if (modelType === 'POSTO3') {
       // ESTRUTURA DE BANCO BDIA + SENSOR POKA YOKE DE INVERSÃO
       // Base metálica
       const baseGeo = new THREE.BoxGeometry(2.5, 0.2, 2);

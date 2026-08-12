@@ -9,13 +9,28 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   FileText,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
 
 export default function Visualizador3D() {
-  const [selectedPosto, setSelectedPosto] = useState('POSTO3');
+  const [selectedPosto, setSelectedPosto] = useState('BANCOS_P13C');
 
   const postosInfo = {
+    BANCOS_P13C: {
+      codigoPY: 'CAD-P13C-FORVIA',
+      nome: 'Estrutura Completa de Bancos P13C (Arquivo CAD Siemens JT)',
+      posto: 'BANCOS P13C',
+      linha: 'BDIA & BTR (Encostos e Assentos P13C)',
+      docCode: 'BANCOS_P13C.jt (ISO JT CAD)',
+      sensorTipo: 'Modelo CAD 3D Siemens JT (BANCOS_P13C.jt)',
+      especificacao: 'Desenho 3D oficial de montagem dos bancos dianteiros e traseiros da linha P13C Faurecia.',
+      falhaEvitada: 'Inconformidade de montagem, travamento de encosto e fecho de cinto P13C.',
+      instrucaoBackup: 'Utilize o modelo 3D para inspecionar posições de folga, interferências e pontos de checagem dos Poka-Yokes.',
+      isCadFile: true,
+      fileUrl: '/BANCOS_P13C.jt',
+      fileSize: '37 MB'
+    },
     POSTO3: {
       codigoPY: 'PY-JPR-225',
       nome: 'Painel CLP Inversão de Estrutura EDIA',
@@ -75,16 +90,22 @@ export default function Visualizador3D() {
           </div>
           <div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
-              Visualizador 3D de Peças Poka-Yoke
+              Visualizador 3D & Arquivo CAD (BANCOS_P13C.jt)
             </h2>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
-              Inspeção 360° interativa para operadores e engenharia da Forvia Faurecia Porto Real.
+              Inspeção 360° interativa e download de arquivo CAD para Engenharia e Operação Forvia Faurecia.
             </p>
           </div>
         </div>
 
-        {/* Seletor de Posto em 3D */}
+        {/* Seletor de Modelo 3D */}
         <div className="segmented-control" style={{ margin: 0 }}>
+          <button 
+            className={`segmented-btn ${selectedPosto === 'BANCOS_P13C' ? 'active' : ''}`}
+            onClick={() => setSelectedPosto('BANCOS_P13C')}
+          >
+            🎨 BANCOS P13C (Arquivo CAD .JT)
+          </button>
           <button 
             className={`segmented-btn ${selectedPosto === 'POSTO3' ? 'active' : ''}`}
             onClick={() => setSelectedPosto('POSTO3')}
@@ -175,6 +196,32 @@ export default function Visualizador3D() {
                 <p style={{ margin: 0, marginTop: '0.2rem', color: '#92400E', lineHeight: '1.4' }}>
                   {currentInfo.instrucaoBackup}
                 </p>
+              </div>
+
+              {/* Botão de Download do Arquivo 3D CAD Original (BANCOS_P13C.jt) */}
+              <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '0.85rem' }}>
+                <a
+                  href="/BANCOS_P13C.jt"
+                  download="BANCOS_P13C.jt"
+                  className="btn btn-primary"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: '#0A1B9F',
+                    color: 'white',
+                    fontWeight: 800,
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    textDecoration: 'none',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
+                  <Download size={18} /> Baixar Arquivo 3D CAD (BANCOS_P13C.jt - 37 MB)
+                </a>
               </div>
 
             </div>
