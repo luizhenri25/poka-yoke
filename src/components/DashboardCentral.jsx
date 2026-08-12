@@ -3,6 +3,7 @@ import { fetchPokaYokesData, fetchInstrucoesList } from '../utils/csvParser';
 import SignatureCanvasModal from './SignatureCanvasModal';
 import AnimatedCharacterCanvas from './AnimatedCharacterCanvas';
 import EditKpiModal from './EditKpiModal';
+import DetailKpiModal from './DetailKpiModal';
 import { useAuth } from '../context/AuthContext';
 import { 
   Activity, 
@@ -28,6 +29,10 @@ export default function DashboardCentral() {
   const [selectedLine, setSelectedLine] = useState('TODAS');
   const [searchOperator, setSearchOperator] = useState('');
   
+  // Estado para Modal de Detalhamento Interativo de Poka-Yokes ao clicar nos cards
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailModalStatus, setDetailModalStatus] = useState('TODOS');
+
   // Estado para Modal de Assinatura com o Dedo
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOp, setSelectedOp] = useState(null);
@@ -259,11 +264,16 @@ export default function DashboardCentral() {
         )}
       </div>
 
-      {/* Cartões KPI - Status dos Poka-Yokes em Tempo Real */}
+      {/* Cartões KPI - Status dos Poka-Yokes em Tempo Real (CLICÁVEIS PARA DETALHAMENTO DE POSTOS) */}
       <div className="grid grid-cols-4" style={{ gap: '1rem' }}>
         
         {/* Total Cadastrados */}
-        <div className="kpi-card">
+        <div 
+          className="kpi-card" 
+          onClick={() => { setDetailModalStatus('TODOS'); setIsDetailModalOpen(true); }}
+          style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+          title="Clique para ver a lista completa de todos os Poka-Yokes"
+        >
           <div className="kpi-icon-box" style={{ backgroundColor: '#EEF2FF', color: 'var(--color-primary)' }}>
             <ShieldCheck size={28} />
           </div>
@@ -274,14 +284,19 @@ export default function DashboardCentral() {
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-text-main)', margin: 0 }}>
               {displayTotal}
             </h3>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600 }}>
-              Mestre ({displayCodigoMestre})
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 700 }}>
+              🔍 Clique para ver os 52 postos
             </span>
           </div>
         </div>
 
         {/* Funcionando */}
-        <div className="kpi-card" style={{ borderLeft: '4px solid #10B981' }}>
+        <div 
+          className="kpi-card" 
+          onClick={() => { setDetailModalStatus('FUNCIONANDO'); setIsDetailModalOpen(true); }}
+          style={{ borderLeft: '4px solid #10B981', cursor: 'pointer', transition: 'all 0.2s ease' }}
+          title="Clique para ver os postos e funções dos Poka-Yokes Funcionando"
+        >
           <div className="kpi-icon-box" style={{ backgroundColor: '#ECFDF5', color: '#10B981' }}>
             <CheckCircle2 size={28} />
           </div>
@@ -293,13 +308,18 @@ export default function DashboardCentral() {
               {displayFuncionando}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>
-              {displayPercFuncionando}% de disponibilidade
+              🟢 {displayPercFuncionando}% ({displayFuncionando} postos OK) — Ver lista
             </span>
           </div>
         </div>
 
         {/* Com Derroga / Backup */}
-        <div className="kpi-card" style={{ borderLeft: '4px solid #F59E0B' }}>
+        <div 
+          className="kpi-card" 
+          onClick={() => { setDetailModalStatus('DERROGA'); setIsDetailModalOpen(true); }}
+          style={{ borderLeft: '4px solid #F59E0B', cursor: 'pointer', transition: 'all 0.2s ease' }}
+          title="Clique para ver os postos e falhas dos Poka-Yokes em Modo Derroga/Backup"
+        >
           <div className="kpi-icon-box" style={{ backgroundColor: '#FFFBEB', color: '#F59E0B' }}>
             <AlertTriangle size={28} />
           </div>
@@ -311,13 +331,18 @@ export default function DashboardCentral() {
               {displayDerroga}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#F59E0B', fontWeight: 700 }}>
-              {displayPercDerroga}% sob acompanhamento
+              🟡 {displayPercDerroga}% ({displayDerroga} em backup) — Ver detalhes
             </span>
           </div>
         </div>
 
         {/* Desativados / Falha */}
-        <div className="kpi-card" style={{ borderLeft: '4px solid #EF4444' }}>
+        <div 
+          className="kpi-card" 
+          onClick={() => { setDetailModalStatus('DESATIVADO'); setIsDetailModalOpen(true); }}
+          style={{ borderLeft: '4px solid #EF4444', cursor: 'pointer', transition: 'all 0.2s ease' }}
+          title="Clique para ver os postos e falhas dos Poka-Yokes Desativados"
+        >
           <div className="kpi-icon-box" style={{ backgroundColor: '#FEF2F2', color: '#EF4444' }}>
             <XCircle size={28} />
           </div>
@@ -329,7 +354,7 @@ export default function DashboardCentral() {
               {displayDesativados}
             </h3>
             <span style={{ fontSize: '0.75rem', color: '#EF4444', fontWeight: 700 }}>
-              {displayPercDesativados}% necessitam ação
+              🔴 {displayPercDesativados}% ({displayDesativados} necessita ação) — Ver
             </span>
           </div>
         </div>
@@ -636,8 +661,15 @@ export default function DashboardCentral() {
             </tbody>
           </table>
         </div>
-
       </div>
+
+      {/* Modal Interativo de Detalhamento de Poka-Yokes ao clicar nos cards KPI */}
+      <DetailKpiModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        statusType={detailModalStatus}
+        pokaYokesList={pokaYokes}
+      />
 
       {/* Modal Interativo de Assinatura com o Dedo (Touch Pad) */}
       <SignatureCanvasModal
@@ -648,19 +680,21 @@ export default function DashboardCentral() {
         postoName={selectedOp?.posto}
       />
 
-      {/* Modal Interativo de Edição de KPIs pela Engenharia */}
+      {/* Modal de Edição de KPIs pela Engenharia */}
       <EditKpiModal
         isOpen={isKpiModalOpen}
         onClose={() => setIsKpiModalOpen(false)}
-        onSave={(newKpis) => setCustomKpis(newKpis)}
-        onResetDefault={() => setCustomKpis(null)}
-        currentKpis={customKpis || {
+        currentData={{
           total: displayTotal,
           funcionando: displayFuncionando,
           backup: displayDerroga,
           falha: displayDesativados,
-          codigoMestre: displayCodigoMestre
+          codigoMestre: displayCodigoMestre,
+          percFuncionando: displayPercFuncionando,
+          percBackup: displayPercDerroga,
+          percFalha: displayPercDesativados
         }}
+        onSave={(updatedKpis) => setCustomKpis(updatedKpis)}
       />
 
     </div>
