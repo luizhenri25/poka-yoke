@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronRight, ShieldAlert, FileText } from 'lucide-react';
+import { ChevronRight, ShieldAlert, FileText, Video, ExternalLink } from 'lucide-react';
 import { modoBackupData, regraComumBackup, frequenciaValidacao } from '../data/modoBackupData';
+import { getPostoLink } from '../data/postoLinksData';
 
 const BDIA_POSTOS = ['POSTO 3', 'POSTO 4', 'POSTO 6', 'POSTO 8', 'POSTO 9', 'POSTO 10', 'POSTO 12', 'IF BDIA', 'RETRABALHO'];
 const BTR_POSTOS = ['PREPARAÇÃO DA ESTRUTURA', 'POSTO 6', 'POSTO 7', 'INSPEÇÃO FINAL - P13C', 'INSPEÇÃO FINAL - P02H'];
@@ -11,6 +12,7 @@ export default function ModoBackup() {
 
   const postos = activeTab === 'BDIA' ? BDIA_POSTOS : BTR_POSTOS;
   const backupData = modoBackupData[activeTab]?.[selectedPosto];
+  const currentLink = getPostoLink('MODO_BACKUP', activeTab, selectedPosto);
 
   return (
     <div className="page-grid">
@@ -66,10 +68,61 @@ export default function ModoBackup() {
           </div>
         ) : (
           <div className="card" style={{ minHeight: '400px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--color-border)' }}>
               <FileText size={24} color="var(--color-primary)" />
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Procedimento Modo Backup - {selectedPosto}</h2>
             </div>
+
+            {/* Link do Vídeo de Backup (mLEAN Corp) */}
+            {currentLink && (
+              <div style={{
+                backgroundColor: '#FEF2F2',
+                border: '1.5px solid #EF4444',
+                borderRadius: 'var(--radius-lg)',
+                padding: '1.25rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                justify: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                  <div style={{ backgroundColor: '#EF4444', color: 'white', padding: '0.75rem', borderRadius: '50%' }}>
+                    <Video size={24} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 900, color: '#991B1B', margin: 0 }}>
+                      Vídeo & Padrão Visual Modo Backup (mLEAN) — {selectedPosto}
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#B91C1C', margin: 0, marginTop: '0.2rem' }}>
+                      Treinamento visual e instrução técnica para contingência do posto
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={currentLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn"
+                  style={{
+                    backgroundColor: '#DC2626',
+                    color: 'white',
+                    fontWeight: 800,
+                    fontSize: '0.85rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.65rem 1.25rem',
+                    borderRadius: 'var(--radius-md)',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <ExternalLink size={16} /> Abrir Vídeo / Padrão Modo Backup (mLEAN)
+                </a>
+              </div>
+            )}
 
             {backupData ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

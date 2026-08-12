@@ -13,10 +13,13 @@ import {
   Calendar,
   Search,
   Lock,
-  X
+  X,
+  Video,
+  ExternalLink
 } from 'lucide-react';
 import SignatureCanvasModal from './SignatureCanvasModal';
 import { useAuth } from '../context/AuthContext';
+import { getPostoLink } from '../data/postoLinksData';
 
 // Base de Dados Padrão de Postos e Operadores da Faurecia
 const DEFAULT_POSTS_DATA = {
@@ -540,7 +543,7 @@ export default function TreinamentoHierarquico() {
                     justify: 'space-between',
                     alignItems: 'center',
                     flexWrap: 'wrap',
-                    gap: '0.5rem'
+                    gap: '0.75rem'
                   }}>
                     <div>
                       <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase' }}>
@@ -551,8 +554,37 @@ export default function TreinamentoHierarquico() {
                       </h4>
                     </div>
 
-                    <div style={{ backgroundColor: '#EEF2FF', color: '#0A1B9F', padding: '0.35rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700 }}>
-                      📜 {postoObj.instrucao}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      {(() => {
+                        const link = getPostoLink(categoria, linha, postoObj.posto);
+                        if (!link) return null;
+                        return (
+                          <a
+                            href={link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              backgroundColor: categoria === 'MODO BACKUP' ? '#FEF2F2' : '#ECFDF5',
+                              color: categoria === 'MODO BACKUP' ? '#DC2626' : '#059669',
+                              border: `1px solid ${categoria === 'MODO BACKUP' ? '#FCA5A5' : '#6EE7B7'}`,
+                              padding: '0.35rem 0.75rem',
+                              borderRadius: '12px',
+                              fontSize: '0.75rem',
+                              fontWeight: 800,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Video size={14} /> Padrão Visual mLEAN <ExternalLink size={12} />
+                          </a>
+                        );
+                      })()}
+
+                      <div style={{ backgroundColor: '#EEF2FF', color: '#0A1B9F', padding: '0.35rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700 }}>
+                        📜 {postoObj.instrucao}
+                      </div>
                     </div>
                   </div>
 

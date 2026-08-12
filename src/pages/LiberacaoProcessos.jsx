@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Square, CheckCircle, AlertTriangle, ChevronRight, Activity } from 'lucide-react';
+import { Volume2, Square, CheckCircle, AlertTriangle, ChevronRight, Activity, ExternalLink, Video } from 'lucide-react';
 import { fetchPokaYokesData, fetchFullInstructionText } from '../utils/csvParser';
+import { getPostoLink } from '../data/postoLinksData';
 
 const BDIA_POSTOS = [
   'POSTO 3', 'POSTO 4', 'POSTO 6', 'POSTO 8', 'POSTO 9', 'POSTO 10', 'POSTO 12', 'IF BDIA', 'RETRABALHO'
@@ -17,6 +18,8 @@ export default function LiberacaoProcessos() {
   const [loading, setLoading] = useState(true);
   const [selectedPosto, setSelectedPosto] = useState('');
   const [fullInstructions, setFullInstructions] = useState([]);
+
+  const currentLink = getPostoLink('LIBERACAO_PY', activeTab, selectedPosto);
 
   useEffect(() => {
     async function loadData() {
@@ -150,6 +153,56 @@ export default function LiberacaoProcessos() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 
+                {/* Link do Vídeo e Padrão Visual (mLEAN Corp) */}
+                {currentLink && (
+                  <div style={{
+                    backgroundColor: '#ECFDF5',
+                    border: '1.5px solid #10B981',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.25rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '1rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                      <div style={{ backgroundColor: '#10B981', color: 'white', padding: '0.75rem', borderRadius: '50%' }}>
+                        <Video size={24} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '1rem', fontWeight: 900, color: '#065F46', margin: 0 }}>
+                          Vídeo & Padrão Visual mLEAN — {selectedPosto}
+                        </h4>
+                        <p style={{ fontSize: '0.8rem', color: '#047857', margin: 0, marginTop: '0.2rem' }}>
+                          Link oficial da plataforma Faurecia mLEAN para treinamento visual do posto
+                        </p>
+                      </div>
+                    </div>
+
+                    <a
+                      href={currentLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-primary"
+                      style={{
+                        backgroundColor: '#059669',
+                        color: 'white',
+                        fontWeight: 800,
+                        fontSize: '0.85rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: 'var(--radius-md)',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <ExternalLink size={16} /> Assistir Vídeo / Ver Padrão mLEAN
+                    </a>
+                  </div>
+                )}
+
                 {/* Resumo Rápido e Áudio */}
                 <div style={{ backgroundColor: 'var(--color-bg-card)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
                   <h4 style={{ fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '1rem', borderBottom: '2px solid var(--color-primary)', paddingBottom: '0.5rem' }}>
