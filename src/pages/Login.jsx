@@ -120,11 +120,19 @@ export default function Login() {
             <Lock size={32} color="var(--color-primary)" />
           </div>
 
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-primary-dark)', margin: 0 }}>
-            POKA-YOKE System
-          </h1>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Autenticação & Controle de Acesso — Forvia Faurecia
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-primary-dark)', margin: 0 }}>
+              POKA-YOKE
+            </h1>
+            <span style={{ color: 'var(--color-border)', fontSize: '1.5rem', fontWeight: 300 }}>|</span>
+            <img 
+              src="/Faurecia_logo.svg" 
+              alt="FORVIA Faurecia" 
+              style={{ height: '26px', objectFit: 'contain' }} 
+            />
+          </div>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', margin: 0 }}>
+            Autenticação & Controle de Acesso — Fábrica Faurecia
           </p>
         </div>
 

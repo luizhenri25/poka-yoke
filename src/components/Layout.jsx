@@ -51,13 +51,15 @@ export default function Layout() {
     <div className="app-container">
       <header className="header" style={{ borderBottom: '1px solid var(--color-border)', justifyContent: 'space-between' }}>
         {/* Left: Logo */}
-        <div className="logo-container" style={{ alignItems: 'center' }}>
-          <Lock size={24} color="var(--color-primary)" />
-          <span className="logo-forvia" style={{ fontSize: '1.5rem' }}>POKA-YOKE</span>
-          <span style={{ color: 'var(--color-border)', fontSize: '1.5rem', fontWeight: 300 }}>|</span>
-          <span className="logo-faurecia" style={{ letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>
-            Forvia Faurecia
-          </span>
+        <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <Lock size={22} color="var(--color-primary)" />
+          <span className="logo-forvia" style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-primary-dark)', letterSpacing: '-0.3px' }}>POKA-YOKE</span>
+          <span style={{ color: 'var(--color-border)', fontSize: '1.4rem', fontWeight: 300, margin: '0 0.1rem' }}>|</span>
+          <img 
+            src="/Faurecia_logo.svg" 
+            alt="FORVIA Faurecia" 
+            style={{ height: '24px', objectFit: 'contain', verticalAlign: 'middle' }} 
+          />
         </div>
 
         {/* Center: Search Bar */}
