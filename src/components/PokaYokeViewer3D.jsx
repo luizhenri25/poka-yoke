@@ -94,57 +94,133 @@ export default function PokaYokeViewer3D({ modelType = 'POSTO3', highlightSensor
     });
 
     if (modelType === 'BANCOS_P13C') {
-      // ESTRUTURA COMPLETA DOS BANCOS P13C (FORVIA FAURECIA - BANCOS_P13C.jt)
-      // Base da plataforma de montagem
-      const baseGeo = new THREE.BoxGeometry(3.6, 0.25, 2.8);
-      const baseMesh = new THREE.Mesh(baseGeo, metalMaterial);
-      baseMesh.position.y = -1.0;
+      // ESTRUTURA DETALHADA DOS BANCOS P13C (FORVIA FAURECIA - CAD BANCOS_P13C.jt)
+      
+      // Materiais Automotivos Customizados
+      const seatFabricMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1E293B, 
+        roughness: 0.85,
+        metalness: 0.1
+      });
+
+      const frameSteelMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x64748B, 
+        metalness: 0.9,
+        roughness: 0.2
+      });
+
+      const leatherMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x0F172A, 
+        roughness: 0.4,
+        metalness: 0.2
+      });
+
+      // Base da plataforma de testes de montagem P13C
+      const baseGeo = new THREE.BoxGeometry(4.2, 0.2, 3.2);
+      const baseMesh = new THREE.Mesh(baseGeo, frameSteelMaterial);
+      baseMesh.position.y = -1.1;
       mainGroup.add(baseMesh);
 
-      // Banco Dianteiro P13C - Assento
-      const seatP13CGeo = new THREE.BoxGeometry(1.4, 0.35, 1.4);
-      const seatP13CMesh = new THREE.Mesh(seatP13CGeo, metalMaterial);
-      seatP13CMesh.position.set(-0.9, -0.4, 0.2);
-      mainGroup.add(seatP13CMesh);
+      // --- 1. BANCO DIANTEIRO P13C (MOTORISTA & PASSAGEIRO) ---
+      // Trilhos de regulagem longitudinal
+      const railGeo = new THREE.BoxGeometry(0.12, 0.15, 2.0);
+      const rail1 = new THREE.Mesh(railGeo, frameSteelMaterial);
+      rail1.position.set(-1.4, -0.9, 0);
+      mainGroup.add(rail1);
+
+      const rail2 = rail1.clone();
+      rail2.position.set(-0.6, -0.9, 0);
+      mainGroup.add(rail2);
+
+      // Assento Dianteiro P13C (Almofada principal + abas de apoio lateral)
+      const seatBaseGeo = new THREE.BoxGeometry(1.0, 0.35, 1.3);
+      const seatBaseMesh = new THREE.Mesh(seatBaseGeo, seatFabricMaterial);
+      seatBaseMesh.position.set(-1.0, -0.65, 0.1);
+      mainGroup.add(seatBaseMesh);
+
+      const sideBolsterL = new THREE.BoxGeometry(0.2, 0.45, 1.3);
+      const bolsterL = new THREE.Mesh(sideBolsterL, leatherMaterial);
+      bolsterL.position.set(-1.45, -0.6, 0.1);
+      mainGroup.add(bolsterL);
+
+      const bolsterR = bolsterL.clone();
+      bolsterR.position.set(-0.55, -0.6, 0.1);
+      mainGroup.add(bolsterR);
 
       // Encosto Dianteiro P13C
-      const backP13CGeo = new THREE.BoxGeometry(1.3, 1.8, 0.3);
-      const backP13CMesh = new THREE.Mesh(backP13CGeo, metalMaterial);
-      backP13CMesh.position.set(-0.9, 0.6, -0.4);
-      backP13CMesh.rotation.x = -0.15;
-      mainGroup.add(backP13CMesh);
+      const backRestGeo = new THREE.BoxGeometry(0.9, 1.6, 0.25);
+      const backRestMesh = new THREE.Mesh(backRestGeo, seatFabricMaterial);
+      backRestMesh.position.set(-1.0, 0.3, -0.45);
+      backRestMesh.rotation.x = -0.15;
+      mainGroup.add(backRestMesh);
 
-      // Apoio de Cabeça P13C
-      const headrestGeo = new THREE.BoxGeometry(0.7, 0.45, 0.25);
-      const headrestMesh = new THREE.Mesh(headrestGeo, metalMaterial);
-      headrestMesh.position.set(-0.9, 1.7, -0.55);
+      // Hastes e Apoio de Cabeça P13C
+      const rodGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.5);
+      const rod1 = new THREE.Mesh(rodGeo, frameSteelMaterial);
+      rod1.position.set(-1.15, 1.15, -0.58);
+      mainGroup.add(rod1);
+
+      const rod2 = rod1.clone();
+      rod2.position.set(-0.85, 1.15, -0.58);
+      mainGroup.add(rod2);
+
+      const headrestGeo = new THREE.BoxGeometry(0.65, 0.4, 0.22);
+      const headrestMesh = new THREE.Mesh(headrestGeo, leatherMaterial);
+      headrestMesh.position.set(-1.0, 1.35, -0.6);
       mainGroup.add(headrestMesh);
 
-      // Banco Traseiro P13C (BTR - Bipartido 60/40)
-      const rearSeatGeo = new THREE.BoxGeometry(1.8, 0.35, 1.5);
-      const rearSeatMesh = new THREE.Mesh(rearSeatGeo, metalMaterial);
-      rearSeatMesh.position.set(0.9, -0.4, 0.2);
+      // --- 2. BANCO TRASEIRO P13C (BTR - BIPARTIDO 60/40) ---
+      // Assento Traseiro Triplo P13C
+      const rearSeatGeo = new THREE.BoxGeometry(1.8, 0.35, 1.4);
+      const rearSeatMesh = new THREE.Mesh(rearSeatGeo, seatFabricMaterial);
+      rearSeatMesh.position.set(0.9, -0.65, 0.1);
       mainGroup.add(rearSeatMesh);
 
-      const rearBackGeo = new THREE.BoxGeometry(1.7, 1.7, 0.3);
-      const rearBackMesh = new THREE.Mesh(rearBackGeo, metalMaterial);
-      rearBackMesh.position.set(0.9, 0.65, -0.4);
-      rearBackMesh.rotation.x = -0.1;
-      mainGroup.add(rearBackMesh);
+      // Encosto Bipartido 60% (Lado Direito)
+      const back60Geo = new THREE.BoxGeometry(1.1, 1.5, 0.25);
+      const back60Mesh = new THREE.Mesh(back60Geo, seatFabricMaterial);
+      back60Mesh.position.set(1.2, 0.25, -0.45);
+      back60Mesh.rotation.x = -0.1;
+      mainGroup.add(back60Mesh);
 
-      // Sensor Poka-Yoke néon de detecção P13C
-      const sensorP13CGeo = new THREE.BoxGeometry(0.3, 0.3, 0.4);
-      const sensorP13CMesh = new THREE.Mesh(sensorP13CGeo, highlightMaterial);
-      sensorP13CMesh.position.set(-0.25, 0.5, -0.4);
-      mainGroup.add(sensorP13CMesh);
-      sensorMeshRef.current = sensorP13CMesh;
+      // Encosto Bipartido 40% (Lado Esquerdo)
+      const back40Geo = new THREE.BoxGeometry(0.65, 1.5, 0.25);
+      const back40Mesh = new THREE.Mesh(back40Geo, seatFabricMaterial);
+      back40Mesh.position.set(0.3, 0.25, -0.45);
+      back40Mesh.rotation.x = -0.1;
+      mainGroup.add(back40Mesh);
 
+      // Apoios de Cabeça Traseiros P13C
+      const rearHeadrest1 = headrestMesh.clone();
+      rearHeadrest1.position.set(1.2, 1.2, -0.55);
+      mainGroup.add(rearHeadrest1);
+
+      const rearHeadrest2 = headrestMesh.clone();
+      rearHeadrest2.position.set(0.3, 1.2, -0.55);
+      mainGroup.add(rearHeadrest2);
+
+      // --- 3. SENSORES POKA-YOKE & PEÇA COELHO P13C ---
       // Fecho de Cinto P13C (Red Rabbit)
-      const buckleGeo = new THREE.BoxGeometry(0.2, 0.6, 0.25);
-      const buckleMesh = new THREE.Mesh(buckleGeo, rabbitMaterial);
-      buckleMesh.position.set(-0.2, -0.1, 0.2);
+      const buckleBodyGeo = new THREE.BoxGeometry(0.18, 0.55, 0.22);
+      const buckleMesh = new THREE.Mesh(buckleBodyGeo, rabbitMaterial);
+      buckleMesh.position.set(-0.4, -0.3, 0.15);
       mainGroup.add(buckleMesh);
       rabbitMeshRef.current = buckleMesh;
+
+      // Sensor Poka-Yoke Néon de Presença e Alinhamento P13C
+      const sensorGeo = new THREE.BoxGeometry(0.35, 0.35, 0.45);
+      const sensorMesh = new THREE.Mesh(sensorGeo, highlightMaterial);
+      sensorMesh.position.set(-0.1, 0.2, -0.45);
+      mainGroup.add(sensorMesh);
+      sensorMeshRef.current = sensorMesh;
+
+      // Feixe Laser Poka-Yoke Néon Azul
+      const laserGeo = new THREE.CylinderGeometry(0.015, 0.015, 2.2);
+      const laserMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8, transparent: true, opacity: 0.85 });
+      const laserMesh = new THREE.Mesh(laserGeo, laserMat);
+      laserMesh.rotation.z = Math.PI / 2;
+      laserMesh.position.set(-0.7, 0.2, -0.45);
+      mainGroup.add(laserMesh);
 
     } else if (modelType === 'POSTO3') {
       // ESTRUTURA DE BANCO BDIA + SENSOR POKA YOKE DE INVERSÃO
